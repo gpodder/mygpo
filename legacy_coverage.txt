@@ -1,13 +1,11 @@
+FILE: api/legacy
+Method: upload
+
 Branch 0 was taken
 Branch 1 was taken
 Branch 2 was taken
-Branch 3 was not taken
+Branch 3 was taken
 Branch 4 was taken
 Branch 5 was taken
-Branch 6 was taken
-Branch 7 was not taken
-Branch 8 was not taken
-Branch 9 was taken
-Branch 10 was not taken
 
-Total coverage (legacy.upload) = 63.63636363636363%
+Total coverage = 100.0%

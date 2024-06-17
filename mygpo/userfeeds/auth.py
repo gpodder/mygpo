@@ -14,6 +14,8 @@ def view_or_basicauth(branch_coverage, view, request, username, token_name, real
     user = get_object_or_404(User, username=username)
 
     token = getattr(user, token_name, "")
+    with open('/home/hussein/sep/fork/mygpo/getattr_check.txt', 'w') as f:
+        f.write(str(token))
 
     # check if a token is required at all
     if token == "":
@@ -67,7 +69,7 @@ def view_or_basicauth(branch_coverage, view, request, username, token_name, real
             
 
 
-    return auth_request()
+    return auth_request() 
 
 
 def auth_request(realm=""):

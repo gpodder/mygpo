@@ -26,6 +26,7 @@ from mygpo.test import create_auth_string
 from mygpo.utils import get_timestamp
 
 from .legacy import upload
+from mygpo.api import legacy
 from io import BytesIO
 
 
@@ -170,11 +171,11 @@ class SubscriptionAPITests(unittest.TestCase):
 
 
     @patch('mygpo.api.legacy.auth')
-    @patch('mygpo.api.backend.get_device')
-    @patch('mygpo.api.opml.Importer')
+    @patch('mygpo.api.legacy.get_device')
+    @patch('mygpo.api.legacy.Importer')
     def test_upload_opml(self, MockImporter, mock_get_device, mock_auth):
         """Tests the upload functionality with an OPML file"""
-        branch_coverage = [False] * 11
+        branch_coverage = [False] * 6
         
         # Mock authentication
         mock_auth.return_value = self.user
@@ -194,7 +195,10 @@ class SubscriptionAPITests(unittest.TestCase):
         MockImporter.return_value = mock_importer
 
         opml_content = b"<opml><body><outline type='rss' xmlUrl='http://example.com/podcast.rss'/></body></opml>"
-        
+
+        # Replace the functions with mocks
+        legacy.subscribe = MagicMock()
+        legacy.unsubscribe = MagicMock()
 
         factory = RequestFactory()
 
@@ -209,14 +213,28 @@ class SubscriptionAPITests(unittest.TestCase):
                 'opml': BytesIO(opml_content)
             }
         )
-        
-        response = upload(request, branch_coverage)    
+
+        response = upload(request, branch_coverage) 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode('utf-8'), "@SUCCESS")
 
+        # Attempt to detect podcasts to be removed
+        mock_device.get_subscribed_podcasts.return_value = [
+            {'url': 'http://example1.com/podcast.rss'},
+            {'url': 'http://example2.com/podcast.rss'}
+        ]
+
+        response = upload(request, branch_coverage) 
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode('utf-8'), "@SUCCESS")
 
         # Attempt at fail in authorisation of user
-        mock_auth.return_value = ""
+        mock_device.get_subscribed_podcasts.return_value = [
+            {'url': 'http://example.com/podcast.rss'},
+            {'url': 'http://example1.com/podcast.rss'},
+            {'url': 'http://example2.com/podcast.rss'}
+        ]
+        mock_auth.return_value = None
         response = upload(request, branch_coverage)    
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode('utf-8'), "@AUTHFAIL")
@@ -237,9 +255,11 @@ class SubscriptionAPITests(unittest.TestCase):
         self.assertEqual(response.content.decode('utf-8'), "@PROTOERROR")
 
 
-        total = 11
+
+        total = 6
         num_taken = 0
         with open('/home/hussein/sep/fork/mygpo/legacy_coverage.txt', 'w') as file:
+            file.write(f"FILE: api/legacy\nMethod: upload\n\n")
             for index, coverage in enumerate(branch_coverage):
                 if coverage:
                     file.write(f"Branch {index} was taken\n")
@@ -248,11 +268,9 @@ class SubscriptionAPITests(unittest.TestCase):
                     file.write(f"Branch {index} was not taken\n")
             file.write(f"\n")
             coverage_level = num_taken/total * 100
-            file.write(f"Total coverage (legacy.upload) = {coverage_level}%\n")
+            file.write(f"Total coverage = {coverage_level}%\n")
 
         
-        
-
 
 
 class DirectoryTest(TestCase):

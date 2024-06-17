@@ -1,2 +1,0 @@
-Branch 1 was taken
-Coverage = 50%

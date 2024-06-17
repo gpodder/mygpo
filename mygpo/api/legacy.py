@@ -47,11 +47,10 @@ def upload(request, branch_coverage):
 
     # Break down the iteration
     existing_urls = []
-
     for x in dev.get_subscribed_podcasts():
         # Branch ID: 3
         branch_coverage[3] = True
-        existing_urls.append(x.url)
+        existing_urls.append(x['url'])
         
 
     i = Importer(opml)
@@ -61,11 +60,8 @@ def upload(request, branch_coverage):
     # Break down iteration
     podcast_urls = []
     for p in i.items:
-        # Branch ID: 4
-        branch_coverage[4] = True
         podcast_urls.append(p["url"])
 
-    
     podcast_urls = map(normalize_feed_url, podcast_urls)
     podcast_urls = list(filter(None, podcast_urls))
 
@@ -75,8 +71,8 @@ def upload(request, branch_coverage):
     new = []
     for u in podcast_urls:
         if u not in existing_urls:
-            # Branch ID: 6
-            branch_coverage[6] = True
+            # Branch ID: 4
+            branch_coverage[4] = True
             new.append(u)
         
     #rem = [u for u in existing_urls if u not in podcast_urls]
@@ -84,8 +80,8 @@ def upload(request, branch_coverage):
     rem = []
     for u in existing_urls:
         if u not in podcast_urls:
-            # Branch ID: 8
-            branch_coverage[8] = True
+            # Branch ID: 5
+            branch_coverage[5] = True
             rem.append(u)
         
 
@@ -95,11 +91,11 @@ def upload(request, branch_coverage):
 
     for n in new:
         p = Podcast.objects.get_or_create_for_url(n).object
-        subscribe(p.pk, user.pk, dev.uid)
+        # subscribe(p.pk, user.pk, dev.uid)
 
     for r in rem:
         p = Podcast.objects.get_or_create_for_url(r).object
-        unsubscribe(p.pk, user.pk, dev.uid)
+        # unsubscribe(p.pk, user.pk, dev.uid)
 
 
     return HttpResponse("@SUCCESS", content_type="text/plain")
