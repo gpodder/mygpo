@@ -40,17 +40,17 @@ class TestViewOrBasicAuth(unittest.TestCase):
         # Encode credentials into base64
         encoded_credentials = base64.b64encode(credentials.encode()).decode()
 
-        # Set the http authorization header
+        # Set the http authorization header, expect authorisation needed reply
         mock_request.META['HTTP_AUTHORIZATION'] = f'Basic {encoded_credentials}'
 
-        result = view_or_basicauth(branch_coverage, mock_view, mock_request, 'testuser', 'some_token_name')
-        self.assertIsNotNone(result)
+        response = view_or_basicauth(branch_coverage, mock_view, mock_request, 'testuser', 'some_token_name')
+        self.assertEqual(response.status_code, 401)
 
-        # Attempt at AUTHORISATION in request.META
+        # Attempt at AUTHORISATION in request.META, expect authorisation needed reply
         mock_request.META['AUTHORIZATION'] = f'Basic {encoded_credentials}'
 
-        result = view_or_basicauth(branch_coverage, mock_view, mock_request, 'testuser', 'some_token_name')
-        self.assertIsNotNone(result)
+        response = view_or_basicauth(branch_coverage, mock_view, mock_request, 'testuser', 'some_token_name')
+        self.assertEqual(response.status_code, 401)
 
         # Attempt at successful authentication
         auth.getattr.return_value = "token1"
@@ -63,8 +63,8 @@ class TestViewOrBasicAuth(unittest.TestCase):
         encoded_credentials = base64.b64encode(credentials.encode()).decode()
         mock_request.META['AUTHORIZATION'] = f'Basic {encoded_credentials}'
 
-        result = view_or_basicauth(branch_coverage, mock_view, mock_request, 'testuser', 'some_token_name')
-        self.assertEqual(result.status_code, 401)
+        response = view_or_basicauth(branch_coverage, mock_view, mock_request, 'testuser', 'some_token_name')
+        self.assertIsNotNone(response)
 
         total = 9
         num_taken = 0
