@@ -3,6 +3,7 @@ from functools import wraps
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+import base64
 
 
 
@@ -14,8 +15,6 @@ def view_or_basicauth(branch_coverage, view, request, username, token_name, real
     user = get_object_or_404(User, username=username)
 
     token = getattr(user, token_name, "")
-    with open('/home/hussein/sep/fork/mygpo/getattr_check.txt', 'w') as f:
-        f.write(str(token))
 
     # check if a token is required at all
     if token == "":
@@ -51,7 +50,12 @@ def view_or_basicauth(branch_coverage, view, request, username, token_name, real
         if auth_type.lower() == "basic":
             # Branch ID: 5
             branch_coverage[5] = True
-            credentials = credentials.decode("base64").split(":", 1)
+            # credentials = credentials.decode("base64").split(":", 1)
+
+            # Rewrite previous line for testing purposes (same logic)
+            decoded_bytes = base64.b64decode(credentials)
+            decoded_str = decoded_bytes.decode('utf-8')
+            credentials = decoded_str.split(":", 1)
             if len(credentials) == 2:
                 # Branch ID: 6
                 branch_coverage[6] = True
@@ -69,7 +73,7 @@ def view_or_basicauth(branch_coverage, view, request, username, token_name, real
             
 
 
-    return auth_request() 
+    return auth_request()
 
 
 def auth_request(realm=""):
