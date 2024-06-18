@@ -1,44 +1,68 @@
-mygpo - Source for gpodder.net
-==============================
+# Report for Assignment 1
 
-mygpo is the website and webservice powering gpodder.net.
+## Project chosen
 
+Name: **mygpo**
 
-License
--------
-mygpo is licensed under the GNU Affero General Public License Version 3. See file [COPYING](COPYING) for details.
+URL: (https://github.com/gpodder/mygpo)
 
+Number of lines of code and the tool used to count it:
+**17,266**, counted using **lizard**
 
-Installation
-------------
-See the [installation instructions](https://gpoddernet.readthedocs.io/en/latest/dev/installation.html) for details.
+Programming language: Python
 
+## Coverage measurement
 
-Bugs
-----
-Please report bugs in the [GitHub issue tracker](https://github.com/gpodder/mygpo/issues).
+### Existing tool
 
+<Inform the name of the existing tool that was executed and how it was executed>
 
-Contributing
-------------
-gpodder.net is an open source project and your contributions are wanted and appreciated.  To get started please see the [developer documentation](https://gpoddernet.readthedocs.io/en/latest/dev/index.html).
+<Show the coverage results provided by the existing tool with a screenshot>
 
-Slack
-------------
-Join our Slack channel: [gpodder-net.slack.com](https://gpodder-net.slack.com/)
+### Your own coverage tool
 
-[Invitation link](https://join.slack.com/t/gpodder-net/shared_invite/zt-aaiagl5i-uZeqVR8w1Yf_G~9rhktRfw)
+<The following is supposed to be repeated for each group member>
 
-Mailing List
-------------
-gpodder.org related issues are discussed on the [gPodder Mailing List](https://gpodder.github.io/docs/mailing-list.html).
+#### Hussein Sarrar
 
+* Function 1: **upload** in **mygpo/api/legacy.py**
 
-Documentation
--------------
-Documentation, especially for the API, is stored in the [**doc** folder](https://github.com/gpodder/mygpo/tree/master/doc) and can be read on [ReadTheDocs](https://gpoddernet.readthedocs.io/en/latest/index.html).
+<Show a patch (diff) or a link to a commit made in your forked repository that shows the instrumented code to gather coverage measurements>
 
+<Provide a screenshot of the coverage results output by the instrumentation>
 
-Name (Why mygpo?)
-------------------
-mygpo is a short version of "my.gpodder.org" which was the old [domain] name of gpodder.net and has been used as the project name since then.
+<Function 2 name>
+
+<Provide the same kind of information provided for Function 1>
+
+## Coverage improvement
+
+### Individual tests
+
+<The following is supposed to be repeated for each group member>
+
+<Group member name>
+
+<Test 1>
+
+<Show a patch (diff) or a link to a commit made in your forked repository that shows the new/enhanced test>
+
+<Provide a screenshot of the old coverage results (the same as you already showed above)>
+
+<Provide a screenshot of the new coverage results>
+
+<State the coverage improvement with a number and elaborate on why the coverage is improved>
+
+<Test 2>
+
+<Provide the same kind of information provided for Test 1>
+
+### Overall
+
+<Provide a screenshot of the old coverage results by running an existing tool (the same as you already showed above)>
+
+<Provide a screenshot of the new coverage results by running the existing tool using all test modifications made by the group>
+
+## Statement of individual contributions
+
+<Write what each group member did>
