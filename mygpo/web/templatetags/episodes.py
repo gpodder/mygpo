@@ -16,7 +16,6 @@ register = template.Library()
 def episode_status_text(episode):
     if not episode or not episode.action:
         return ""
-
     if episode.action == "new":
         return _("New episode")
     elif episode.action == "download":
