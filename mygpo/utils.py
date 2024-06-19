@@ -473,6 +473,7 @@ def parse_request_body(request):
 
 
 def normalize_feed_url(url):
+    coverage = [False] * 11
     """
     Converts any URL to http:// or ftp:// so that it can be
     used with "wget". If the URL cannot be converted (invalid
@@ -533,6 +534,8 @@ def normalize_feed_url(url):
     """
     url = url.strip()
     if not url or len(url) < 8:
+        # Branch ID: 0
+        coverage[0] = True
         return None
 
     # This is a list of prefixes that you can use to minimize the amount of
@@ -550,11 +553,15 @@ def normalize_feed_url(url):
 
     for prefix, expansion in PREFIXES.items():
         if url.startswith(prefix):
+            # Branch ID: 1
+            coverage[1] = True
             url = expansion % (url[len(prefix) :],)
             break
 
     # Assume HTTP for URLs without scheme
     if not "://" in url:
+        # Branch ID: 2
+        coverage[2] = True
         url = "http://" + url
 
     scheme, netloc, path, query, fragment = urllib.parse.urlsplit(url)
@@ -571,13 +578,19 @@ def normalize_feed_url(url):
 
     # Normalize empty paths to "/"
     if path == "":
+        # Branch ID: 3
+        coverage[3] = True
         path = "/"
 
     # feed://, itpc:// and itms:// are really http://
     if scheme in ("feed", "itpc", "itms"):
+        # Branch ID: 4
+        coverage[4] = True
         scheme = "http"
 
     if scheme not in ("http", "https", "ftp", "file"):
+        # Branch ID: 5
+        coverage[5] = True
         return None
 
     # urlunsplit might return "a slighty different, but equivalent URL"
