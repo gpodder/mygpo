@@ -20,7 +20,7 @@ from mygpo.test import create_auth_string, anon_request
 from django.utils.safestring import mark_safe
 from django.templatetags.static import static
 from django.utils.translation import gettext as _
-from mygpo.web.templatetags.episodes import episode_status_icon
+from mygpo.web.templatetags.episodes import episode_status_icon, initialize_coverage, report_coverage
 
 
 import logging
@@ -40,6 +40,12 @@ class MockUtils:
     def format_time(time):
         return time
 class EpisodeStatusIconTests(TestCase):
+
+    def setUp(self):
+        initialize_coverage()
+
+    def tearDown(self):
+        report_coverage()
 
     def test_no_action(self):
         action = Action()
