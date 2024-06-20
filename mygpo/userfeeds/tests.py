@@ -68,7 +68,7 @@ class TestViewOrBasicAuth(unittest.TestCase):
 
         total = 9
         num_taken = 0
-        with open('/home/hussein/sep/fork/mygpo/view_or_basicauth_coverage.txt', 'w') as file:
+        with open('/home/hussein/sep/fork/mygpo/coverage/hussein/view_or_basicauth_coverage.txt', 'w') as file:
             file.write(f"FILE: userfeeds/auth.py\nMethod: view_or_basic_auth\n\n")
             for index, coverage in enumerate(branch_coverage):
                 if coverage:
@@ -79,11 +79,3 @@ class TestViewOrBasicAuth(unittest.TestCase):
             file.write(f"\n")
             coverage_level = num_taken/total * 100
             file.write(f"Total coverage: {coverage_level}%\n")
-
-    # Additional tests can be added here to cover other branches like:
-    # - Token is required but not provided
-    # - Token is required and provided correctly
-    # - Token is required but provided incorrectly
-
-if __name__ == '__main__':
-    unittest.main()

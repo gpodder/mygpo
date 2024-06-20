@@ -258,7 +258,7 @@ class SubscriptionAPITests(unittest.TestCase):
 
         total = 6
         num_taken = 0
-        with open('/home/hussein/sep/fork/mygpo/legacy_coverage.txt', 'w') as file:
+        with open('/home/hussein/sep/fork/mygpo/coverage/hussein/upload_coverage.txt', 'w') as file:
             file.write(f"FILE: api/legacy\nMethod: upload\n\n")
             for index, coverage in enumerate(branch_coverage):
                 if coverage:
@@ -270,7 +270,7 @@ class SubscriptionAPITests(unittest.TestCase):
             coverage_level = num_taken/total * 100
             file.write(f"Total coverage = {coverage_level}%\n")
 
-        
+    
 
 
 class DirectoryTest(TestCase):
