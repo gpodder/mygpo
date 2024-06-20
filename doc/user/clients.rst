@@ -8,23 +8,24 @@ Clients
 Android
 -------
 
-====================  ==========  ==========================================================  ========  ==================================================
-Name                  Status      gpodder.net features                                        License   Documentation
-====================  ==========  ==========================================================  ========  ==================================================
-`AntennaPod`_         Active      Directory, Search, Subscription sync, Episode Action sync   GPL 3     `How to synchronize between devices`_
+====================  ==========  ==========================================================  ================  ==================================================
+Name                  Status      gpodder.net features                                        License           Documentation
+====================  ==========  ==========================================================  ================  ==================================================
+`AntennaPod`_         Active      Directory, Search, Subscription sync, Episode Action sync   GPL 3             `How to synchronize between devices`_
 `Escapepod`_          Active      Search                                                      MIT
+`Kasts`_              Active      Subscription and Episode Action sync                        GPL-2.0-or-later
 `Listen Up Free`_     Active      sync, subscription, search
 `Podcast Addict`_     Active      none
 `Podkicker`_          Active      none
 `Podax`_              Abandoned   Subscription sync                                           BSD
 `Volksempfänger`_     Abandoned   Podcast search                                              ISC
 `SwallowCatcher`_     Abandoned   Planned                                                     AGPL
-`Detlef Gpodderson`_  Abandoned   Subscription and Episode Action sync                        GPL       `Detlef Repository`_
-`gpodroid`_           Abandoned   Subscriptions only                                          EPL       `gpodroid Repository`_
+`Detlef Gpodderson`_  Abandoned   Subscription and Episode Action sync                        GPL               `Detlef Repository`_
+`gpodroid`_           Abandoned   Subscriptions only                                          EPL               `gpodroid Repository`_
 `Podstars`_           Abandoned   Podcast search
 `Podcatcher Deluxe`_  Deprecated  Sync of subscriptions and actions                           GPL 3
 `SoundWaves`_         Abandoned   Subscriptions sync                                          GPL 3
-====================  ==========  ==========================================================  ========  ==================================================
+====================  ==========  ==========================================================  ================  ==================================================
 
 
 Mac OS X
@@ -62,15 +63,16 @@ Name              Status  gpodder.net features                    License     Do
 Linux
 -----
 
-=========================  ===========  ========================================================  ===========  ===============
-Name                       Status       gpodder.net features                                      License      Documentation
-=========================  ===========  ========================================================  ===========  ===============
-`gPodder`_                 Active       All                                                       GPL          `gPodder Docs`_
+=========================  ===========  ========================================================  ================  ===============
+Name                       Status       gpodder.net features                                      License           Documentation
+=========================  ===========  ========================================================  ================  ===============
+`gPodder`_                 Active       All                                                       GPL               `gPodder Docs`_
 `Amarok`_                  Active       Directory, Search, Subscription-Sync (under development)  GPL
 `BashPodder`_                           Subscription sync via "bpsync" included in mygpoclient    GPL
 `Clementine`_              Active       Directory, Search, Subscription sync                      GPL
+`Kasts`_                   Active       Subscription and Episode Action sync                      GPL-2.0-or-later
 `Mopidy-Podcast-GPodder`_  Development  Directory, Search                                         Apache 2.0
-=========================  ===========  ========================================================  ===========  ===============
+=========================  ===========  ========================================================  ================  ===============
 
 
 Windows Phone 7 / 8
@@ -164,3 +166,4 @@ Nokia Podcasting       -       Subscription service    GPL         `Podcasting D
 .. _Podmaster: http://www.johanpaul.com/blog/2011/08/introducing-podcatcher-for-nokia-n9/
 .. _Poddi: http://www.allaboutsymbian.com/reviews/item/15840_Poddi_Podcatcher.php
 .. _Poddi in the Nokia Store: http://store.ovi.com/content/317235
+.. _Kasts: https://apps.kde.org/en/kasts/
