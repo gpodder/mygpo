@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 import doctest
 import uuid
 import os.path
@@ -16,11 +17,106 @@ from mygpo.podcasts.models import Podcast, Episode, Slug
 import mygpo.web.utils
 from mygpo.web.logo import CoverArt, get_logo_url
 from mygpo.test import create_auth_string, anon_request
+from django.utils.safestring import mark_safe
+from django.templatetags.static import static
+from django.utils.translation import gettext as _
+from mygpo.web.templatetags.episodes import episode_status_icon
+
 
 import logging
 
 logger = logging.getLogger(__name__)
 
+class Action:
+    def __init__(self, action=None, timestamp=None, client=None, started=None, stopped=None):
+        self.action = action
+        self.timestamp = timestamp
+        self.client = client
+        self.started = started
+        self.stopped = stopped
+
+class MockUtils:
+    @staticmethod
+    def format_time(time):
+        return time
+class EpisodeStatusIconTests(TestCase):
+
+    def test_no_action(self):
+        action = Action()
+        result = episode_status_icon(action)
+        expected = '<img src="%s" alt="nothing" title="%s" />' % (
+            static('nothing.png'), _("Unplayed episode"))
+        self.assertEqual(result, mark_safe(expected))
+
+    def test_flattr_action(self):
+        action = Action(action='flattr')
+        result = episode_status_icon(action)
+        expected = '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" alt="flattr" title="%s" />' % (_("The episode has been flattr'd"),)
+        self.assertEqual(result, mark_safe(expected))
+
+    def test_new_action(self):
+        action = Action(action='new', timestamp='2022-01-01')
+        result = episode_status_icon(action)
+        expected = '<img src="%s" alt="new" title="%s" />' % (
+            static('new.png'),
+            "%s on 2022-01-01" % (_("This episode has been marked new")))
+        self.assertEqual(result, mark_safe(expected))
+
+    def test_download_action(self):
+        action = Action(action='download', timestamp='2022-01-01')
+        result = episode_status_icon(action)
+        expected = '<img src="%s" alt="downloaded" title="%s" />' % (
+            static('download.png'),
+            "%s on 2022-01-01" % (_("This episode has been downloaded")))
+        self.assertEqual(result, mark_safe(expected))
+
+    @patch('mygpo.web.templatetags.episodes.utils.format_time', side_effect=MockUtils.format_time)
+    def test_play_action_with_started_and_stopped(self, mock_format_time):
+        action = Action(action='play', timestamp='2022-01-01', started='10:00', stopped='10:30')
+        result = episode_status_icon(action)
+        playback_info = _(" from %(start)s to %(end)s") % {
+            "start": MockUtils.format_time(action.started),
+            "end": MockUtils.format_time(action.stopped),
+        }
+        expected = '<img src="%s" alt="played" title="%s" />' % (
+            static('playback.png'),
+            "%s on 2022-01-01%s" % (_("This episode has been played"), playback_info))
+        self.assertEqual(result, mark_safe(expected))
+
+    @patch('mygpo.web.templatetags.episodes.utils.format_time', side_effect=MockUtils.format_time)
+    def test_play_action_with_stopped_only(self, mock_format_time):
+        action = Action(action='play', timestamp='2022-01-01', stopped='10:30')
+        result = episode_status_icon(action)
+        playback_info = _(" to position %s") % (
+            MockUtils.format_time(action.stopped),
+        )
+        expected = '<img src="%s" alt="played" title="%s" />' % (
+            static('playback.png'),
+            "%s on 2022-01-01%s" % (_("This episode has been played"), playback_info))
+        self.assertEqual(result, mark_safe(expected))
+
+    @patch('mygpo.web.templatetags.episodes.utils.format_time', side_effect=MockUtils.format_time)
+    def test_play_action_without_stopped(self, mock_format_time):
+        action = Action(action='play', timestamp='2022-01-01')
+        result = episode_status_icon(action)
+        playback_info = ""
+        expected = '<img src="%s" alt="played" title="%s" />' % (
+            static('playback.png'),
+            "%s on 2022-01-01%s" % (_("This episode has been played"), playback_info))
+        self.assertEqual(result, mark_safe(expected))
+
+    def test_delete_action(self):
+        action = Action(action='delete', timestamp='2022-01-01')
+        result = episode_status_icon(action)
+        expected = '<img src="%s" alt="deleted" title="%s"/>' % (
+            static('delete.png'),
+            "%s on 2022-01-01" % (_("This episode has been deleted")))
+        self.assertEqual(result, mark_safe(expected))
+
+    def test_unknown_action(self):
+        action = Action(action='unknown')
+        result = episode_status_icon(action)
+        self.assertEqual(result, 'unknown')
 
 IMG_PATH1 = os.path.abspath(
     os.path.join(settings.BASE_DIR, "..", "res", "gpoddernet_228.png")
