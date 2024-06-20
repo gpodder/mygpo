@@ -7,6 +7,81 @@ from . import flickr
 
 import responses
 
+import unittest
+from unittest.mock import Mock
+from datetime import datetime
+from mygpo.data.feeddownloader import EpisodeUpdater
+
+class TestEpisodeUpdater(unittest.TestCase):
+
+    def setUp(self):
+        self.mock_episode = Mock()
+        self.mock_podcast = Mock()
+        self.updater = EpisodeUpdater(self.mock_episode, self.mock_podcast)
+
+    def test_update_episode(self):
+        # Mock data
+        parsed_episode = {
+            'guid': 'new-guid',
+            'description': 'new-description',
+            'subtitle': 'new-subtitle',
+            'content': 'new-content',
+            'link': 'http://new-link.com',
+            'released': 1609459200,  # 2021-01-01 00:00:00 UTC
+            'author': 'new-author',
+            'duration': 3600,
+            'files': [{'filesize': 1024, 'mimetype': 'audio/mp3', 'urls': ['http://file-url.com']}],
+            'language': 'en',
+            'flattr': 'http://flattr-url.com',
+            'license': 'CC-BY',
+            'title': 'new-title',
+        }
+
+        self.updater.update_episode(parsed_episode)
+
+        # Verify attributes
+        self.assertEqual(self.mock_episode.guid, 'new-guid')
+        self.assertEqual(self.mock_episode.description, 'new-description')
+        self.assertEqual(self.mock_episode.subtitle, 'new-subtitle')
+        self.assertEqual(self.mock_episode.content, 'new-content')
+        self.assertEqual(self.mock_episode.link, 'http://new-link.com')
+        self.assertEqual(self.mock_episode.released, datetime.utcfromtimestamp(1609459200))
+        self.assertEqual(self.mock_episode.author, 'new-author')
+        self.assertEqual(self.mock_episode.duration, 3600)
+        self.assertEqual(self.mock_episode.filesize, 1024)
+        self.assertEqual(self.mock_episode.language, 'en')
+        self.assertEqual(self.mock_episode.flattr_url, 'http://flattr-url.com')
+        self.assertEqual(self.mock_episode.license, 'CC-BY')
+        self.assertEqual(self.mock_episode.title, 'new-title')
+        self.assertTrue(self.mock_episode.save.called)
+
+    def test_mark_outdated(self):
+        # Test not outdated
+        self.mock_episode.outdated = False
+        self.updater.mark_outdated()
+        
+        print("Test when episode is not outdated")
+        self.assertTrue(self.mock_episode.outdated)
+        self.assertTrue(self.mock_episode.save.called)
+        self.assertTrue(self.updater.branch_coverage[2])
+        self.assertFalse(self.updater.branch_coverage[1])
+
+        # Reset 
+        self.updater.branch_coverage = {1: False, 2: False}
+
+        # Test outdated
+        self.mock_episode.outdated = True
+        self.mock_episode.save.reset_mock()  
+        result = self.updater.mark_outdated()
+        
+        print("Test when episode is already outdated")
+        self.assertIsNone(result)
+        self.assertTrue(self.updater.branch_coverage[1])
+        self.assertFalse(self.updater.branch_coverage[2])
+        self.assertFalse(self.mock_episode.save.called)  
+
+    def test_report_coverage(self):
+        self.updater.report_coverage()
 
 MEDIUM_URL = "https://farm6.staticflickr.com/5001/1246644888_36863b0856.jpg"
 
