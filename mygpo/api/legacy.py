@@ -40,6 +40,9 @@ def upload(request, branch_coverage):
         # Branch ID: 2
         branch_coverage[2] = True
         return HttpResponse("@AUTHFAIL", content_type="text/plain")
+    else:
+        # Branch ID: 3
+        branch_coverage[3] = True
 
     dev = get_device(user, LEGACY_DEVICE_UID, request.META.get("HTTP_USER_AGENT", ""))
 
@@ -60,6 +63,7 @@ def upload(request, branch_coverage):
     # Break down iteration
     podcast_urls = []
     for p in i.items:
+        # Branch ID: 4
         podcast_urls.append(p["url"])
 
     podcast_urls = map(normalize_feed_url, podcast_urls)
@@ -70,19 +74,29 @@ def upload(request, branch_coverage):
     # Break down iteration
     new = []
     for u in podcast_urls:
+        # Branch ID: 5
+        branch_coverage[5] = True
         if u not in existing_urls:
-            # Branch ID: 4
-            branch_coverage[4] = True
+            # Branch ID: 6
+            branch_coverage[6] = True
             new.append(u)
-        
+        else:
+            # Branch ID: 7
+            branch_coverage[7] = True
+
     #rem = [u for u in existing_urls if u not in podcast_urls]
 
     rem = []
     for u in existing_urls:
+        # Branch ID: 8
+        branch_coverage[8] = True
         if u not in podcast_urls:
-            # Branch ID: 5
-            branch_coverage[5] = True
+            # Branch ID: 9
+            branch_coverage[9] = True
             rem.append(u)
+        else:
+            # Branch ID: 10
+            branch_coverage[10] = True
         
 
     # remove duplicates
@@ -90,13 +104,16 @@ def upload(request, branch_coverage):
     rem = list(set(rem))
 
     for n in new:
+        # Branch ID: 11
+        branch_coverage[11] = True
         p = Podcast.objects.get_or_create_for_url(n).object
-        # subscribe(p.pk, user.pk, dev.uid)
+        subscribe(p.pk, user.pk, dev.uid)
 
     for r in rem:
+        # Branch ID: 12
+        branch_coverage[12] = True
         p = Podcast.objects.get_or_create_for_url(r).object
-        # unsubscribe(p.pk, user.pk, dev.uid)
-
+        unsubscribe(p.pk, user.pk, dev.uid)
 
     return HttpResponse("@SUCCESS", content_type="text/plain")
 

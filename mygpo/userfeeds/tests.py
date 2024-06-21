@@ -11,7 +11,7 @@ class TestViewOrBasicAuth(unittest.TestCase):
     @patch('mygpo.userfeeds.auth.get_object_or_404')
     def test_view_or_basicauth_no_token_required(self, mock_get_object_or_404, mock_get_user_model):
         # Setup
-        branch_coverage = [False] * 9
+        branch_coverage = [False] * 14
 
         mock_view = MagicMock()
         mock_request = HttpRequest()
@@ -26,6 +26,7 @@ class TestViewOrBasicAuth(unittest.TestCase):
         # Attempt at no authorisation needed (empty token)
         response = view_or_basicauth(branch_coverage, mock_view, mock_request, 'testuser', 'some_token_name')
         self.assertIsNotNone(response)
+        self.assertIsInstance(response, MagicMock)
 
         # Attempt at authorisation needed reply
         auth.getattr.return_value = "some_token"
@@ -37,10 +38,7 @@ class TestViewOrBasicAuth(unittest.TestCase):
         password = 'pass'
         credentials = f'{username}:{password}'
 
-        # Encode credentials into base64
         encoded_credentials = base64.b64encode(credentials.encode()).decode()
-
-        # Set the http authorization header, expect authorisation needed reply
         mock_request.META['HTTP_AUTHORIZATION'] = f'Basic {encoded_credentials}'
 
         response = view_or_basicauth(branch_coverage, mock_view, mock_request, 'testuser', 'some_token_name')
@@ -52,6 +50,34 @@ class TestViewOrBasicAuth(unittest.TestCase):
         response = view_or_basicauth(branch_coverage, mock_view, mock_request, 'testuser', 'some_token_name')
         self.assertEqual(response.status_code, 401)
 
+        # Attempt at sending invalid header
+        mock_request.META['AUTHORIZATION'] = f'Basic{encoded_credentials}'
+
+        response = view_or_basicauth(branch_coverage, mock_view, mock_request, 'testuser', 'some_token_name')
+        self.assertEqual(response.status_code, 401)
+
+        # Attempt at sending invalid credentials
+        credentials = f'{username}'
+        encoded_credentials = base64.b64encode(credentials.encode()).decode()
+        mock_request.META['AUTHORIZATION'] = f'Basic {encoded_credentials}'
+
+        response = view_or_basicauth(branch_coverage, mock_view, mock_request, 'testuser', 'some_token_name')
+        self.assertEqual(response.status_code, 401)
+
+        # Attempt at sending incorrect credentials
+        auth.getattr.return_value = "token_not1"
+
+        username = 'testuser'
+        password = 'token1'
+        credentials = f'{username}:{password}'
+
+        encoded_credentials = base64.b64encode(credentials.encode()).decode()
+        mock_request.META['AUTHORIZATION'] = f'Basic {encoded_credentials}'
+
+        response = view_or_basicauth(branch_coverage, mock_view, mock_request, 'testuser', 'some_token_name')
+        self.assertEqual(response.status_code, 401)
+
+
         # Attempt at successful authentication
         auth.getattr.return_value = "token1"
 
@@ -59,23 +85,28 @@ class TestViewOrBasicAuth(unittest.TestCase):
         password = 'token1'
         credentials = f'{username}:{password}'
 
-        # Encode credentials into base64
         encoded_credentials = base64.b64encode(credentials.encode()).decode()
         mock_request.META['AUTHORIZATION'] = f'Basic {encoded_credentials}'
 
         response = view_or_basicauth(branch_coverage, mock_view, mock_request, 'testuser', 'some_token_name')
         self.assertIsNotNone(response)
+        self.assertIsInstance(response, MagicMock)
 
-        total = 9
-        num_taken = 0
-        with open('/home/hussein/sep/fork/mygpo/coverage/hussein/view_or_basicauth_coverage.txt', 'w') as file:
-            file.write(f"FILE: userfeeds/auth.py\nMethod: view_or_basic_auth\n\n")
-            for index, coverage in enumerate(branch_coverage):
-                if coverage:
-                    file.write(f"Branch {index} was taken\n")
-                    num_taken += 1
-                else:
-                    file.write(f"Branch {index} was not taken\n")
-            file.write(f"\n")
-            coverage_level = num_taken/total * 100
-            file.write(f"Total coverage: {coverage_level}%\n")
+        write_coverage_report("/home/hussein/sep/fork/mygpo/coverage/hussein/view_or_basicauth_coverage.txt", branch_coverage)
+
+        
+
+def write_coverage_report(path, branch_coverage):
+    total = len(branch_coverage)
+    num_taken = 0
+    with open(path, 'w') as file:
+        file.write(f"FILE: userfeeds/auth.py\nMethod: view_or_basic_auth\n\n")
+        for index, coverage in enumerate(branch_coverage):
+            if coverage:
+                file.write(f"Branch {index} was taken\n")
+                num_taken += 1
+            else:
+                file.write(f"Branch {index} was not taken\n")
+        file.write(f"\n")
+        coverage_level = num_taken/total * 100
+        file.write(f"Total coverage: {coverage_level}%\n")

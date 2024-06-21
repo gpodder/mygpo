@@ -21,35 +21,38 @@ def view_or_basicauth(branch_coverage, view, request, username, token_name, real
         # Branch ID: 0
         branch_coverage[0] = True
         return view(request, username, *args, **kwargs)
+    else:
+        # Branch ID: 1
+        branch_coverage[1] = True
 
     # this header format is used when passing auth-headers
     # from Aapache to fcgi
     if "AUTHORIZATION" in request.META:
-        # Branch ID: 1
-        branch_coverage[1] = True
+        # Branch ID: 2
+        branch_coverage[2] = True
         auth = request.META["AUTHORIZATION"]
 
     elif "HTTP_AUTHORIZATION" in request.META:
-        # Branch ID: 2
-        branch_coverage[2] = True
+        # Branch ID: 3
+        branch_coverage[3] = True
         auth = request.META["HTTP_AUTHORIZATION"]
 
     else:
-        # Branch ID: 3
-        branch_coverage[3] = True
+        # Branch ID: 4
+        branch_coverage[4] = True
         return auth_request()
 
     auth = auth.split(None, 1)
 
     if len(auth) == 2:
-        # Branch ID: 4
-        branch_coverage[4] = True
+        # Branch ID: 5
+        branch_coverage[5] = True
         auth_type, credentials = auth
 
         # NOTE: We are only support basic authentication for now.
         if auth_type.lower() == "basic":
-            # Branch ID: 5
-            branch_coverage[5] = True
+            # Branch ID: 6
+            branch_coverage[6] = True
             # credentials = credentials.decode("base64").split(":", 1)
 
             # Rewrite previous line for testing purposes (same logic)
@@ -57,20 +60,31 @@ def view_or_basicauth(branch_coverage, view, request, username, token_name, real
             decoded_str = decoded_bytes.decode('utf-8')
             credentials = decoded_str.split(":", 1)
             if len(credentials) == 2:
-                # Branch ID: 6
-                branch_coverage[6] = True
+                # Branch ID: 7
+                branch_coverage[7] = True
                 uname, passwd = credentials
 
                 if uname != username:
-                    # Branch ID: 7
-                    branch_coverage[7] = True
-                    return auth_request()
-
-                if token == passwd:
                     # Branch ID: 8
                     branch_coverage[8] = True
+                    return auth_request()
+                else:
+                    # Branch ID: 9
+                    branch_coverage[9] = True
+
+                if token == passwd:
+                    # Branch ID: 10
+                    branch_coverage[10] = True
                     return view(request, uname, *args, **kwargs)
-            
+                else:
+                    # Branch ID: 11
+                    branch_coverage[11] = True
+            else:
+                # Branch ID: 12
+                branch_coverage[12] = True
+    else:
+        # Branch ID: 13
+        branch_coverage[13] = True
 
 
     return auth_request()

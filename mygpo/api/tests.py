@@ -113,6 +113,23 @@ class AdvancedAPITests(unittest.TestCase):
         return True
 
 
+def write_coverage_report(path, branch_coverage):
+
+    total = len(branch_coverage)
+    num_taken = 0
+
+    with open(path, 'w') as file:
+        file.write(f"FILE: api/legacy\nMethod: upload\n\n")
+        for index, coverage in enumerate(branch_coverage):
+            if coverage:
+                file.write(f"Branch {index} was taken\n")
+                num_taken += 1
+            else:
+                file.write(f"Branch {index} was not taken\n")
+        file.write(f"\n")
+        coverage_level = num_taken/total * 100
+        file.write(f"Total coverage = {coverage_level}%\n")
+
 class SubscriptionAPITests(unittest.TestCase):
     """Tests the Subscription API"""
 
@@ -144,6 +161,7 @@ class SubscriptionAPITests(unittest.TestCase):
 
     def tearDown(self):
         self.user.delete()
+    
 
     def test_set_get_subscriptions(self):
         """Tests that an upload subscription is returned back correctly"""
@@ -175,7 +193,7 @@ class SubscriptionAPITests(unittest.TestCase):
     @patch('mygpo.api.legacy.Importer')
     def test_upload_opml(self, MockImporter, mock_get_device, mock_auth):
         """Tests the upload functionality with an OPML file"""
-        branch_coverage = [False] * 6
+        branch_coverage = [False] * 13
         
         # Mock authentication
         mock_auth.return_value = self.user
@@ -254,21 +272,11 @@ class SubscriptionAPITests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode('utf-8'), "@PROTOERROR")
 
+        write_coverage_report("/home/hussein/sep/fork/mygpo/coverage/hussein/upload_coverage.txt", branch_coverage)
 
 
-        total = 6
-        num_taken = 0
-        with open('/home/hussein/sep/fork/mygpo/coverage/hussein/upload_coverage.txt', 'w') as file:
-            file.write(f"FILE: api/legacy\nMethod: upload\n\n")
-            for index, coverage in enumerate(branch_coverage):
-                if coverage:
-                    file.write(f"Branch {index} was taken\n")
-                    num_taken += 1
-                else:
-                    file.write(f"Branch {index} was not taken\n")
-            file.write(f"\n")
-            coverage_level = num_taken/total * 100
-            file.write(f"Total coverage = {coverage_level}%\n")
+
+        
 
     
 
