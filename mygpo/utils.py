@@ -556,12 +556,18 @@ def normalize_feed_url(url, coverage):
             coverage[1] = True
             url = expansion % (url[len(prefix) :],)
             break
+        else:
+            # Branch ID: 2
+            coverage[2] = True
 
     # Assume HTTP for URLs without scheme
     if not "://" in url:
         # Branch ID: 2
-        coverage[2] = True
+        coverage[3] = True
         url = "http://" + url
+    else:
+        # Branch ID: 3
+        coverage[4] = True
 
     scheme, netloc, path, query, fragment = urllib.parse.urlsplit(url)
 
@@ -578,19 +584,28 @@ def normalize_feed_url(url, coverage):
     # Normalize empty paths to "/"
     if path == "":
         # Branch ID: 3
-        coverage[3] = True
+        coverage[5] = True
         path = "/"
+    else:
+        # Branch ID: 4
+        coverage[6] = True
 
     # feed://, itpc:// and itms:// are really http://
     if scheme in ("feed", "itpc", "itms"):
         # Branch ID: 4
-        coverage[4] = True
+        coverage[7] = True
         scheme = "http"
+    else:
+        # Branch ID: 5
+        coverage[8] = True
 
     if scheme not in ("http", "https", "ftp", "file"):
         # Branch ID: 5
-        coverage[5] = True
+        coverage[9] = True
         return None
+    else:
+        # Branch ID: 6
+        coverage[10] = True
 
     # urlunsplit might return "a slighty different, but equivalent URL"
     return urllib.parse.urlunsplit((scheme, netloc, path, query, fragment))

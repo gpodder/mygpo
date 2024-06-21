@@ -315,7 +315,7 @@ class PublisherPageTests(TestCase):
 
 class TestEpisodeStatusText(TestCase):
     def test_episode_status_text(self):
-        coverage = [False] * 11
+        coverage = [False] * 12
 
         # Create a mock device with a name attribute
         MockDevice = Mock()
@@ -331,41 +331,45 @@ class TestEpisodeStatusText(TestCase):
         MockEpisode.action = None
         self.assertEqual(episode_status_text(MockEpisode, coverage), "")
 
-        # Test branch 1
+        #Test branch 1
+        MockEpisode.action = ""
+        episode_status_text(MockEpisode, coverage), ""
+
+        # Test branch 2
         # episode = Episode(action="new", device=MockDevice)
         MockEpisode.action = "new"
         self.assertEqual(episode_status_text(MockEpisode, coverage), "New episode")
 
-        # Test branch 2 3
+        # Test branch 3 4
         # episode = Episode(action="download", device=MockDevice)
         MockEpisode.action = "download"
         self.assertEqual(episode_status_text(MockEpisode, coverage), "Downloaded to Device1")
 
-        # Test branch 2 4
+        # Test branch 3 5 
         # episode = Episode(action="download", device=None)
         MockEpisode.action = "download"
         MockDevice.name = None
         self.assertEqual(episode_status_text(MockEpisode, coverage), "Downloaded")
 
-        # Test branch 5 6
+        # Test branch 6 7
         # episode = Episode(action="play", device=MockDevice)
         MockEpisode.action = "play"
         MockDevice.name = "Device1"
         self.assertEqual(episode_status_text(MockEpisode, coverage), "Played on Device1")
 
-        # Test branch 5 7
+        # Test branch 6 8
         # episode = Episode(action="play", device=MockDevice)
         MockEpisode.action = "play"
         MockDevice.name = None
         self.assertEqual(episode_status_text(MockEpisode, coverage), "Played")
 
-        # Test branch 8 9
+        # Test branch 9 10
         # episode = Episode(action="delete", device=MockDevice)
         MockEpisode.action = "delete"
         MockDevice.name = "Device1"
         self.assertEqual(episode_status_text(MockEpisode, coverage), "Deleted on Device1")
 
-        # Test branch 8 10
+        # Test branch 9 11
         # episode = Episode(action="delete", device=MockDevice)
         MockEpisode.action = "delete"
         MockDevice.name = None

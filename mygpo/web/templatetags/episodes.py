@@ -18,42 +18,45 @@ def episode_status_text(episode, coverage):
         # Branch ID: 0
         coverage[0] = True
         return ""
-    if episode.action == "new":
+    else:
         # Branch ID: 1
         coverage[1] = True
-        return _("New episode")
-    elif episode.action == "download":
+    if episode.action == "new":
         # Branch ID: 2
         coverage[2] = True
+        return _("New episode")
+    elif episode.action == "download":
+        # Branch ID: 3
+        coverage[3] = True
         if episode.device.name:
-            # Brthianch ID: 3
-            coverage[3] = True
+            # Brthianch ID: 4
+            coverage[4] = True
             return _("Downloaded to %s") % episode.device.name
         else:
-            # Branch ID: 4
-            coverage[4] = True
+            # Branch ID: 5
+            coverage[5] = True
             return _("Downloaded")
     elif episode.action == "play":
-        # Branch ID: 5
-        coverage[5] = True
+        # Branch ID: 6
+        coverage[6] = True
         if episode.device.name:
-            # Branch ID: 6
-            coverage[6] = True
-            return _("Played on %s") % episode.device.name
-        else:
             # Branch ID: 7
             coverage[7] = True
+            return _("Played on %s") % episode.device.name
+        else:
+            # Branch ID: 8
+            coverage[8] = True
             return _("Played")
     elif episode.action == "delete":
-        # Branch ID: 8
-        coverage[8] = True
+        # Branch ID: 9
+        coverage[9] = True
         if episode.device.name:
-            # Branch ID: 9
-            coverage[9] = True
-            return _("Deleted on %s") % episode.device.name
-        else:
             # Branch ID: 10
             coverage[10] = True
+            return _("Deleted on %s") % episode.device.name
+        else:
+            # Branch ID: 11
+            coverage[11] = True
             return _("Deleted")
     return _("Unknown status")
 
