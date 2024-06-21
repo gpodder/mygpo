@@ -472,8 +472,7 @@ def parse_request_body(request):
     return json.loads(raw_body.decode("utf-8"))
 
 
-def normalize_feed_url(url):
-    coverage = [False] * 11
+def normalize_feed_url(url, coverage):
     """
     Converts any URL to http:// or ftp:// so that it can be
     used with "wget". If the URL cannot be converted (invalid

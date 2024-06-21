@@ -17,6 +17,11 @@ import mygpo.web.utils
 from mygpo.web.logo import CoverArt, get_logo_url
 from mygpo.test import create_auth_string, anon_request
 
+from unittest.mock import Mock
+from django.utils.translation import gettext as _
+from mygpo.web.templatetags.episodes import episode_status_text
+from mygpo.utils import normalize_feed_url
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -308,3 +313,87 @@ class PublisherPageTests(TestCase):
 
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
+
+
+class TestEpisodeStatusText(unittest.TestCase):
+    def setUp(self):
+        self.coverage = [False] * 11
+
+    def test_no_episode_or_action(self):
+        result = episode_status_text(None, self.coverage)
+        self.assertEqual(result, "")
+        self.assertTrue(self.coverage[0])
+
+    def test_new_episode(self):
+        episode = Mock(action="new")
+        result = episode_status_text(episode, self.coverage)
+        self.assertEqual(result, _("New episode"))
+        self.assertTrue(self.coverage[1])
+
+    def test_download_episode(self):
+        episode = Mock(action="download", device=Mock(name=None))
+        result = episode_status_text(episode, self.coverage)
+        self.assertEqual(result, _("Downloaded"))
+        self.assertTrue(self.coverage[2])
+        self.assertTrue(self.coverage[4])
+
+        episode = Mock(action="download", device=Mock(name="Device1"))
+        result = episode_status_text(episode, self.coverage)
+        self.assertEqual(result, _("Downloaded to %s") % "Device1")
+        self.assertTrue(self.coverage[3])
+
+    def test_play_episode(self):
+        episode = Mock(action="play", device=Mock(name=None))
+        result = episode_status_text(episode, self.coverage)
+        self.assertEqual(result, _("Played"))
+        self.assertTrue(self.coverage[5])
+        self.assertTrue(self.coverage[7])
+
+        episode = Mock(action="play", device=Mock(name="Device1"))
+        result = episode_status_text(episode, self.coverage)
+        self.assertEqual(result, _("Played on %s") % "Device1")
+        self.assertTrue(self.coverage[6])
+
+    def test_delete_episode(self):
+        episode = Mock(action="delete", device=Mock(name=None))
+        result = episode_status_text(episode, self.coverage)
+        self.assertEqual(result, _("Deleted"))
+        self.assertTrue(self.coverage[8])
+        self.assertTrue(self.coverage[10])
+
+        episode = Mock(action="delete", device=Mock(name="Device1"))
+        result = episode_status_text(episode, self.coverage)
+        self.assertEqual(result, _("Deleted on %s") % "Device1")
+        self.assertTrue(self.coverage[9])
+
+    def test_unknown_status(self):
+        episode = Mock(action="unknown", device=Mock(name="Device1"))
+        result = episode_status_text(episode, self.coverage)
+        self.assertEqual(result, _("Unknown status"))
+
+    def tearDown(self):
+        with open("coverage_report.txt", "w") as f:
+            f.write(str(self.coverage))
+
+
+class TestNormalizeFeedUrl(unittest.TestCase):
+    def test_itpc_scheme(self):
+        coverage = {i: False for i in range(6)}
+        result = normalize_feed_url("itpc://example.org/podcast.rss", coverage)
+        self.assertEqual(result, "http://example.org/podcast.rss")
+        self.assertTrue(coverage[4])
+
+    def test_no_scheme(self):
+        coverage = {i: False for i in range(6)}
+        result = normalize_feed_url("curry.com", coverage)
+        self.assertEqual(result, "http://curry.com/")
+        self.assertTrue(coverage[2])
+
+    # Add more test cases here...
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+if __name__ == "__main__":
+    unittest.main()

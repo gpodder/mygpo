@@ -13,48 +13,47 @@ register = template.Library()
 
 
 @register.filter
-def episode_status_text(episode, branch_coverage):
+def episode_status_text(episode, coverage):
     if not episode or not episode.action:
         # Branch ID: 0
-        branch_coverage[0] = True
+        coverage[0] = True
         return ""
-
     if episode.action == "new":
         # Branch ID: 1
-        branch_coverage[1] = True
+        coverage[1] = True
         return _("New episode")
     elif episode.action == "download":
         # Branch ID: 2
-        branch_coverage[2] = True
+        coverage[2] = True
         if episode.device.name:
-            # Branch ID: 3
-            branch_coverage[3] = True
+            # Brthianch ID: 3
+            coverage[3] = True
             return _("Downloaded to %s") % episode.device.name
         else:
             # Branch ID: 4
-            branch_coverage[4] = True
+            coverage[4] = True
             return _("Downloaded")
     elif episode.action == "play":
         # Branch ID: 5
-        branch_coverage[5] = True
+        coverage[5] = True
         if episode.device.name:
             # Branch ID: 6
-            branch_coverage[6] = True
+            coverage[6] = True
             return _("Played on %s") % episode.device.name
         else:
             # Branch ID: 7
-            branch_coverage[7] = True
+            coverage[7] = True
             return _("Played")
     elif episode.action == "delete":
         # Branch ID: 8
-        branch_coverage[8] = True
+        coverage[8] = True
         if episode.device.name:
             # Branch ID: 9
-            branch_coverage[9] = True
+            coverage[9] = True
             return _("Deleted on %s") % episode.device.name
         else:
             # Branch ID: 10
-            branch_coverage[10] = True
+            coverage[10] = True
             return _("Deleted")
     return _("Unknown status")
 
