@@ -472,7 +472,146 @@ def parse_request_body(request):
     return json.loads(raw_body.decode("utf-8"))
 
 
-def normalize_feed_url(url, coverage):
+def normalize_feed_url(url):
+    """
+    Converts any URL to http:// or ftp:// so that it can be
+    used with "wget". If the URL cannot be converted (invalid
+    or unknown scheme), "None" is returned.
+
+    This will also normalize feed:// and itpc:// to http://.
+
+    >>> normalize_feed_url('itpc://example.org/podcast.rss')
+    'http://example.org/podcast.rss'
+
+    If no URL scheme is defined (e.g. "curry.com"), we will
+    simply assume the user intends to add a http:// feed.
+
+    >>> normalize_feed_url('curry.com')
+    'http://curry.com/'
+
+    There are even some more shortcuts for advanced users
+    and lazy typists (see the source for details).
+
+    >>> normalize_feed_url('fb:43FPodcast')
+    'http://feeds.feedburner.com/43FPodcast'
+
+    It will also take care of converting the domain name to
+    all-lowercase (because domains are not case sensitive):
+
+    >>> normalize_feed_url('http://Example.COM/')
+    'http://example.com/'
+
+    Some other minimalistic changes are also taken care of,
+    e.g. a ? with an empty query is removed:
+
+    >>> normalize_feed_url('http://example.org/test?')
+    'http://example.org/test'
+
+    Leading and trailing whitespace is removed
+
+    >>> normalize_feed_url(' http://example.com/podcast.rss ')
+    'http://example.com/podcast.rss'
+
+    HTTP Authentication is removed to protect users' privacy
+
+    >>> normalize_feed_url('http://a@b:c@host.com/')
+    'http://host.com/'
+    >>> normalize_feed_url('ftp://a:b:c@host.com/')
+    'ftp://host.com/'
+    >>> normalize_feed_url('http://i%2Fo:P%40ss%3A@host.com/')
+    'http://host.com/'
+    >>> normalize_feed_url('ftp://%C3%B6sterreich@host.com/')
+    'ftp://host.com/'
+    >>> normalize_feed_url('http://w%20x:y%20z@example.org/')
+    'http://example.org/'
+    >>> normalize_feed_url('http://example.com/x@y:z@test.com/')
+    'http://example.com/x%40y%3Az%40test.com/'
+    >>> normalize_feed_url('http://en.wikipedia.org/wiki/Ä')
+    'http://en.wikipedia.org/wiki/%C3%84'
+    >>> normalize_feed_url('http://en.wikipedia.org/w/index.php?title=Ä&action=edit')
+    'http://en.wikipedia.org/w/index.php?title=%C3%84&action=edit'
+    """
+    url = url.strip()
+    if not url or len(url) < 8:
+        # Branch ID: 0
+        coverage[0] = True
+        return None
+
+    # This is a list of prefixes that you can use to minimize the amount of
+    # keystrokes that you have to use.
+    # Feel free to suggest other useful prefixes, and I'll add them here.
+    PREFIXES = {
+        "fb:": "http://feeds.feedburner.com/%s",
+        "yt:": "http://www.youtube.com/rss/user/%s/videos.rss",
+        "sc:": "http://soundcloud.com/%s",
+        "fm4od:": "http://onapp1.orf.at/webcam/fm4/fod/%s.xspf",
+        # YouTube playlists. To get a list of playlists per-user, use:
+        # https://gdata.youtube.com/feeds/api/users/<username>/playlists
+        "ytpl:": "http://gdata.youtube.com/feeds/api/playlists/%s",
+    }
+
+    for prefix, expansion in PREFIXES.items():
+        if url.startswith(prefix):
+            # Branch ID: 1
+            coverage[1] = True
+            url = expansion % (url[len(prefix) :],)
+            break
+        else:
+            # Branch ID: 2
+            coverage[2] = True
+
+    # Assume HTTP for URLs without scheme
+    if not "://" in url:
+        # Branch ID: 2
+        coverage[3] = True
+        url = "http://" + url
+    else:
+        # Branch ID: 3
+        coverage[4] = True
+
+    scheme, netloc, path, query, fragment = urllib.parse.urlsplit(url)
+
+    # Schemes and domain names are case insensitive
+    scheme, netloc = scheme.lower(), netloc.lower()
+
+    # encode non-encoded characters
+    path = urllib.parse.quote(path, "/%")
+    query = urllib.parse.quote_plus(query, ":&=")
+
+    # Remove authentication to protect users' privacy
+    netloc = netloc.rsplit("@", 1)[-1]
+
+    # Normalize empty paths to "/"
+    if path == "":
+        # Branch ID: 3
+        coverage[5] = True
+        path = "/"
+    else:
+        # Branch ID: 4
+        coverage[6] = True
+
+    # feed://, itpc:// and itms:// are really http://
+    if scheme in ("feed", "itpc", "itms"):
+        # Branch ID: 4
+        coverage[7] = True
+        scheme = "http"
+    else:
+        # Branch ID: 5
+        coverage[8] = True
+
+    if scheme not in ("http", "https", "ftp", "file"):
+        # Branch ID: 5
+        coverage[9] = True
+        return None
+    else:
+        # Branch ID: 6
+        coverage[10] = True
+
+    # urlunsplit might return "a slighty different, but equivalent URL"
+    return urllib.parse.urlunsplit((scheme, netloc, path, query, fragment))
+
+
+def normalize_url(url, coverage): #used for testing above function
     """
     Converts any URL to http:// or ftp:// so that it can be
     used with "wget". If the URL cannot be converted (invalid
