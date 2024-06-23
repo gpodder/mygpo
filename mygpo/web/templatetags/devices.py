@@ -34,32 +34,38 @@ def device_type(device):
 
 
 @register.filter()
-def device_icon(device):
+def device_icon(device, coverage, staticfiles_storage=None):
 
     ua_str = (device.user_agent or "").lower()
 
-    # TODO: better client detection
     if "gpodder" in ua_str:
+        coverage[0] = True
         icon = "gpodder.png"
         caption = "gPodder"
     elif "amarok" in ua_str:
+        coverage[1] = True
         icon = "amarok.png"
         caption = "Amarok"
     elif "podax" in ua_str:
+        coverage[2] = True
         icon = "podax.png"
         caption = "Podax"
 
     else:
+        coverage[3] = True
         device_type = device.type
         icon = DEVICE_TYPE_ICONS.get(device_type, None)
         caption = DEVICE_TYPES_DICT.get(device_type, None)
 
     if icon is not None and caption is not None:
+        coverage[4] = True
         caption = gettext(caption)
         html = '<img src="%(icon)s" alt="%(caption)s" class="device_icon"/>' % dict(
             icon=staticfiles_storage.url(os.path.join("clients", icon)), caption=caption
         )
         return mark_safe(html)
+    else:
+        coverage[5] = True
 
     return ""
 
