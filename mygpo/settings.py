@@ -39,7 +39,14 @@ ADMINS = re.findall(r"\s*([^<]+) <([^>]+)>\s*", os.getenv("ADMINS", ""))
 MANAGERS = ADMINS
 
 DATABASES = {
-    "default": dj_database_url.config(default="postgres://mygpo:mygpo@localhost/mygpo")
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'mygpo_database',
+        'USER': 'mygpo_user',
+        'PASSWORD': 'newpassword',
+        'HOST': 'localhost',
+        'PORT': '5342',
+    }
 }
 
 
