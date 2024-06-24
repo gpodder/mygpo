@@ -272,7 +272,7 @@ class SubscriptionAPITests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode('utf-8'), "@PROTOERROR")
 
-        write_coverage_report("/home/hussein/sep/fork/mygpo/coverage/hussein/upload_coverage.txt", branch_coverage)
+        write_coverage_report("/home/hussein/sep/fork/mygpo/coverage/hussein/legacy/upload_coverage.txt", branch_coverage)
 
 
 
