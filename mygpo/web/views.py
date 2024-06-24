@@ -49,7 +49,7 @@ def welcome(request):
 @cache_control(private=True)
 @login_required
 
-def dashboard(request, episode_count=10, branch_coverage_dashboard):
+def dashboard(request, episode_count=10):
     subscribed_podcasts = get_subscribed_podcasts(request.user)
     subscribed_podcasts = [sp.podcast for sp in subscribed_podcasts]
 
@@ -60,39 +60,30 @@ def dashboard(request, episode_count=10, branch_coverage_dashboard):
     checklist = []
 
     if request.user.client_set.count():
-        branch_coverage_dashboard[0] = True
         checklist.append("devices")
 
     if subscribed_podcasts:
-        branch_coverage_dashboard[1] = True;
         checklist.append("subscriptions")
 
     if FavoriteEpisode.objects.filter(user=request.user).exists():
-        branch_coverage_dashboard[2] = True;
         checklist.append("favorites")
 
     if not request.user.profile.get_token("subscriptions_token"):
-        branch_coverage_dashboard[3] = True;
         checklist.append("share")
 
     if not request.user.profile.get_token("favorite_feeds_token"):
-        branch_coverage_dashboard[4] = True;
         checklist.append("share-favorites")
 
     if not request.user.profile.get_token("userpage_token"):
-        branch_coverage_dashboard[5] = True;
         checklist.append("userpage")
 
     if Tag.objects.filter(user=request.user).exists():
-        branch_coverage_dashboard[6] = True;
         checklist.append("tags")
 
     if PodcastList.objects.filter(user=request.user).exists():
-        branch_coverage_dashboard[7] = True;
         checklist.append("lists")
 
     if PublishedPodcast.objects.filter(publisher=request.user).exists():
-        branch_coverage_dashboard[8] = True;
         checklist.append("publish")
 
     tomorrow = datetime.today() + timedelta(days=1)

@@ -9,7 +9,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-branch_coverage_UAF = []
 class UserAccountForm(forms.Form):
     """
     the form that is used in the account settings.
@@ -48,15 +47,6 @@ class UserAccountForm(forms.Form):
         required=False,
     )
 
-    def write_coverage(self):
-        with open('/home/hussein/sep/fork/mygpo/legacy_coverage.txt', 'w') as file:
-            for index, coverage in enumerate(branch_coverage_UAF):
-                if coverage:
-                    file.write(f"Branch {index} was taken\n")
-                else:
-                    file.write(f"Branch {index} was not taken\n")
-
-
     def is_valid(self):
         if not super(UserAccountForm, self).is_valid():
             return False
@@ -65,23 +55,15 @@ class UserAccountForm(forms.Form):
         pw2 = self.cleaned_data["password2"]
 
         if self.cleaned_data["password_current"] or pw1 or pw2:
-            branch_coverage_UAF[0] = True
             if self.cleaned_data["password_current"] == "":
-                branch_coverage_UAF[1] = True
-                self.write_coverage()
                 return False  # must give current password
 
             if pw1 == "":
-                branch_coverage_UAF[2] = True
-                self.write_coverage()
                 return False  # cant set empty password
 
             if pw1 != pw2:
-                branch_coverage_UAF[3] = True
-                self.write_coverage()
                 return False  # 5must confirm password
 
-        self.write_coverage()
         return True
 
 class ProfileForm(forms.Form):
