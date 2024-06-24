@@ -45,10 +45,10 @@ def welcome(request):
 
     return render(request, "home.html", {"url": current_site, "toplist": toplist})
 
+
 @vary_on_cookie
 @cache_control(private=True)
 @login_required
-
 def dashboard(request, episode_count=10):
     subscribed_podcasts = get_subscribed_podcasts(request.user)
     subscribed_podcasts = [sp.podcast for sp in subscribed_podcasts]

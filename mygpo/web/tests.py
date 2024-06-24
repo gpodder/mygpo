@@ -16,17 +16,11 @@ from django.test import RequestFactory
 from django.contrib.auth.models import User
 
 from mygpo.podcasts.models import Podcast, Episode, Slug, Tag
-import mygpo.web.utils
 from mygpo.web.logo import CoverArt, get_logo_url
 from mygpo.test import create_auth_string, anon_request
-from .forms import UserAccountForm
-from mygpo.web.views import dashboard
-from mygpo.podcastlists.models import PodcastList
-from mygpo.publisher.models import PublishedPodcast
 import logging
 
 from .templatetags.devices import device_icon
-from ..favorites.models import FavoriteEpisode
 
 logger = logging.getLogger(__name__)
 

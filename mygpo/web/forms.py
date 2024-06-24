@@ -9,6 +9,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class UserAccountForm(forms.Form):
     """
     the form that is used in the account settings.
@@ -55,6 +56,7 @@ class UserAccountForm(forms.Form):
         pw2 = self.cleaned_data["password2"]
 
         if self.cleaned_data["password_current"] or pw1 or pw2:
+
             if self.cleaned_data["password_current"] == "":
                 return False  # must give current password
 
@@ -65,6 +67,7 @@ class UserAccountForm(forms.Form):
                 return False  # 5must confirm password
 
         return True
+
 
 class ProfileForm(forms.Form):
     twitter = forms.CharField(
