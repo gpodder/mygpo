@@ -376,7 +376,7 @@ class TestEpisodeStatusText(TestCase):
         self.assertEqual(episode_status_text(MockEpisode, coverage), "Deleted")
 
         write_coverage_to_file(
-            "/Users/samuelpower/Desktop/MockedSEP/coverage.txt",
+            "/Users/samuelpower/Desktop/SEP2/coverage.txt",
             "episode status",
             coverage,
         )

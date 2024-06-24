@@ -37,7 +37,23 @@ class TestNormalizeFeedURL(unittest.TestCase):
         url = "gopher://example.com"
         self.assertEqual(normalize_url(url, coverage), None)
         write_coverage_to_file(
-            "/Users/samuelpower/Desktop/MockedSEP/coverage.txt",
+            "/Users/samuelpower/Desktop/SEP2/coverage.txt",
             "normalize feed url",
             coverage,
         )
+
+
+def write_coverage_to_file(filename, method_name, branch_coverage):
+    total = len(branch_coverage)
+    num_taken = 0
+    with open(filename, "w") as file:
+        file.write(f"FILE: {filename}\nMethod: {method_name}\n")
+        for index, coverage in enumerate(branch_coverage):
+            if coverage:
+                file.write(f"Branch {index} was taken\n")
+                num_taken += 1
+            else:
+                file.write(f"Branch {index} was not taken\n")
+        file.write("\n")
+        coverage_level = num_taken / total * 100
+        file.write(f"Total coverage = {coverage_level}%\n")
