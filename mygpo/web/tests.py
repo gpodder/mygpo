@@ -2,6 +2,7 @@ import unittest
 import doctest
 import uuid
 import os.path
+from unittest.mock import patch, MagicMock
 
 import requests
 import responses
@@ -11,13 +12,21 @@ from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth import get_user_model
+from django.test import RequestFactory
+from django.contrib.auth.models import User
 
-from mygpo.podcasts.models import Podcast, Episode, Slug
+from mygpo.podcasts.models import Podcast, Episode, Slug, Tag
 import mygpo.web.utils
 from mygpo.web.logo import CoverArt, get_logo_url
 from mygpo.test import create_auth_string, anon_request
-
+from .forms import UserAccountForm
+from mygpo.web.views import dashboard
+from mygpo.podcastlists.models import PodcastList
+from mygpo.publisher.models import PublishedPodcast
 import logging
+
+from .templatetags.devices import device_icon
+from ..favorites.models import FavoriteEpisode
 
 logger = logging.getLogger(__name__)
 
@@ -308,3 +317,47 @@ class PublisherPageTests(TestCase):
 
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
+
+
+class DeviceTest(unittest.TestCase):
+    @patch('mygpo.web.templatetags.devices.staticfiles_storage')
+    @patch('mygpo.web.templatetags.devices.mark_safe')
+    def test_device(self, mock_mark_safe, mock_staticfiles_storage):
+        mock_mark_safe.return_value = "mark_safe"
+
+        coverage = [False] * 6
+
+        mock_device = MagicMock()
+        mock_device.user_agent = "gPodder"
+        mock_device.type = "desktop"
+
+        result = device_icon(mock_device, coverage, staticfiles_storage=mock_staticfiles_storage)
+        expected_html = 'mark_safe'
+        self.assertEqual(result, expected_html)
+
+        mock_device.user_agent = "Amarok"
+        mock_device.type = "desktop"
+        result = device_icon(mock_device, coverage, staticfiles_storage=mock_staticfiles_storage)
+        expected_html = 'mark_safe'
+        self.assertEqual(result, expected_html)
+
+        mock_device.user_agent = "Podax"
+        mock_device.type = "desktop"
+        result = device_icon(mock_device, coverage, staticfiles_storage=mock_staticfiles_storage)
+        expected_html = 'mark_safe'
+        self.assertEqual(result, expected_html)
+
+        mock_device.user_agent = "other"
+        mock_device.type = "unknown"
+        result = device_icon(mock_device, coverage, staticfiles_storage=mock_staticfiles_storage)
+        expected_html = ""
+        self.assertEqual(result, expected_html)
+
+        mock_device.user_agent = "none"
+        mock_device.type = "none"
+        result = device_icon(mock_device, coverage, staticfiles_storage=mock_staticfiles_storage)
+        expected_html = ""
+        self.assertEqual(result, expected_html)
+
+        write_coverage_report("/home/hussein/sep/fork/mygpo/coverage/hussein/device_icon_coverage.txt", coverage,
+                              "web/templatetags/devices.py", "device_icons")
