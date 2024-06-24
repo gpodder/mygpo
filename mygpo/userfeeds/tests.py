@@ -11,7 +11,7 @@ class TestViewOrBasicAuth(unittest.TestCase):
     @patch('mygpo.userfeeds.auth.get_object_or_404')
     def test_view_or_basicauth_no_token_required(self, mock_get_object_or_404, mock_get_user_model):
         # Setup
-        branch_coverage = [False] * 14
+        branch_coverage = [False] * 15
 
         mock_view = MagicMock()
         mock_request = HttpRequest()
@@ -52,6 +52,14 @@ class TestViewOrBasicAuth(unittest.TestCase):
 
         # Attempt at sending invalid header
         mock_request.META['AUTHORIZATION'] = f'Basic{encoded_credentials}'
+
+        response = view_or_basicauth(branch_coverage, mock_view, mock_request, 'testuser', 'some_token_name')
+        self.assertEqual(response.status_code, 401)
+
+        # Attempt at not 'basic' authentication header (unknown)
+        credentials = f'{username}'
+        encoded_credentials = base64.b64encode(credentials.encode()).decode()
+        mock_request.META['AUTHORIZATION'] = f'Unknown_method {encoded_credentials}'
 
         response = view_or_basicauth(branch_coverage, mock_view, mock_request, 'testuser', 'some_token_name')
         self.assertEqual(response.status_code, 401)

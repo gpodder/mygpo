@@ -5,7 +5,7 @@ Branch 0 was taken
 Branch 1 was taken
 Branch 2 was taken
 Branch 3 was taken
-Branch 4 was not taken
+Branch 4 was taken
 Branch 5 was taken
 Branch 6 was taken
 Branch 7 was taken
@@ -15,4 +15,4 @@ Branch 10 was taken
 Branch 11 was taken
 Branch 12 was taken
 
-Total coverage = 92.3076923076923%
+Total coverage = 100.0%

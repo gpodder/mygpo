@@ -64,6 +64,7 @@ def upload(request, branch_coverage):
     podcast_urls = []
     for p in i.items:
         # Branch ID: 4
+        branch_coverage[4] = True
         podcast_urls.append(p["url"])
 
     podcast_urls = map(normalize_feed_url, podcast_urls)

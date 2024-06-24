@@ -15,5 +15,6 @@ Branch 10 was taken
 Branch 11 was taken
 Branch 12 was taken
 Branch 13 was taken
+Branch 14 was taken
 
 Total coverage: 100.0%

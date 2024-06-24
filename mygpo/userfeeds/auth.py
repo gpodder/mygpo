@@ -82,10 +82,12 @@ def view_or_basicauth(branch_coverage, view, request, username, token_name, real
             else:
                 # Branch ID: 12
                 branch_coverage[12] = True
+        else:
+            # Branch ID: 13
+            branch_coverage[13] = True
     else:
-        # Branch ID: 13
-        branch_coverage[13] = True
-
+        # Branch ID: 14
+        branch_coverage[14] = True
 
     return auth_request()
 
