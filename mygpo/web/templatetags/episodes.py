@@ -22,7 +22,11 @@ coverage_data = {
     'branch_6': 0,
     'branch_7': 0,
     'branch_8': 0,
-    'branch_9': 0
+    'branch_9': 0,
+    'branch_10': 0,
+    'branch_11': 0,
+    'branch_12': 0,
+    'branch_13': 0
 }
 
 def initialize_coverage():
@@ -78,52 +82,54 @@ def episode_status_icon(action):
     global coverage_data
 
     if not action or not action.action:
-        coverage_data['branch_1'] += 1
+        coverage_data['branch_1'] += 1 #Branch 1 taken
         s = '<img src="%s" alt="nothing" title="%s" />' % (
             staticfiles_storage.url("nothing.png"),
             _("Unplayed episode"),
         )
     else:
-        coverage_data['branch_2'] += 1
+        coverage_data['branch_2'] += 1 #Branch 2 taken
         date_string = (_(" on %s") % (action.timestamp)) if action.timestamp else ""
         device_string = (_(" on %s") % (action.client.name)) if action.client else ""
 
         if action.action == "flattr":
-            coverage_data['branch_3'] += 1
+            coverage_data['branch_3'] += 1 #Branch 3 taken
             s = (
                 '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" alt="flattr" title="%s" />'
                 % (_("The episode has been flattr'd"),)
             )
 
         elif action.action == "new":
-            coverage_data['branch_4'] += 1
+            coverage_data['branch_4'] += 1 #Branch 4 taken
             s = '<img src="%s" alt="new" title="%s" />' % (
                 staticfiles_storage.url("new.png"),
                 "%s%s%s"
                 % (_("This episode has been marked new"), date_string, device_string),
             )
         elif action.action == "download":
-            coverage_data['branch_5'] += 1
+            coverage_data['branch_5'] += 1 #Branch 5 taken
             s = '<img src="%s" alt="downloaded" title="%s" />' % (
                 staticfiles_storage.url("download.png"),
                 "%s%s%s"
                 % (_("This episode has been downloaded"), date_string, device_string),
             )
         elif action.action == "play":
-            coverage_data['branch_6'] += 1
+            coverage_data['branch_6'] += 1 #Branch 6 taken
             if action.stopped is not None:
-                coverage_data['branch_7'] += 1
+                coverage_data['branch_7'] += 1 #Branch 7 taken
                 if getattr(action, "started", None) is not None:
+                    coverage_data['branch_10']+=1 #Branch 10 taken, implicit branch
                     playback_info = _(" from %(start)s to %(end)s") % {
                         "start": utils.format_time(action.started),
                         "end": utils.format_time(action.stopped),
                     }
                 else:
+                    coverage_data['branch_11'] += 1 #Branch 11 taken, implicit branch
                     playback_info = _(" to position %s") % (
                         utils.format_time(action.stopped),
                     )
             else:
-                coverage_data['branch_8'] += 1
+                coverage_data['branch_8'] += 1 #Branch 8 taken
                 playback_info = ""
             s = '<img src="%s" alt="played" title="%s" />' % (
                 staticfiles_storage.url("playback.png"),
@@ -136,15 +142,16 @@ def episode_status_icon(action):
                 ),
             )
         elif action.action == "delete":
-            coverage_data['branch_9'] += 1
+            coverage_data['branch_9'] += 1 #Branch 9 taken
             s = '<img src="%s" alt="deleted" title="%s" />' % (
                 staticfiles_storage.url("delete.png"),
                 "%s%s%s"
                 % (_("This episode has been deleted"), date_string, device_string),
             )
         else:
+            coverage_data['branch_12'] +=1 # Branch 12 taken, implicit branch
             return action.action  # this is not marked safe by intention
-
+    coverage_data['branch_13'] +=1 #Branch 13 taken, hidden branch
     return mark_safe(s)
 
 

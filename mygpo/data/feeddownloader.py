@@ -550,11 +550,11 @@ class EpisodeUpdater(object):
     def mark_outdated(self):
         """marks the episode outdated if its not already"""
         if self.episode.outdated:
-            self.branch_coverage[1] = True
+            self.branch_coverage[1] = True #Branch 1 taken
             return None
         else:
-            self.branch_coverage[2] = True
-            
+            self.branch_coverage[2] = True #Branch 2 taken
+        #No hidden branches
         print("Branch state in outdated", self.branch_coverage)
         self.episode.outdated = True
         self.episode.last_update = datetime.utcnow()
