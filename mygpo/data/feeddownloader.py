@@ -554,13 +554,14 @@ class EpisodeUpdater(object):
             return None
         else:
             self.branch_coverage[2] = True
-
+            
+        print("Branch state in outdated", self.branch_coverage)
         self.episode.outdated = True
         self.episode.last_update = datetime.utcnow()
         self.episode.save()
 
     def report_coverage(self):
-        print("Branch coverage:", self.branch_coverage)
+       return self.branch_coverage 
 
 def file_basename_no_extension(filename):
     """Returns filename without extension

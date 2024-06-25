@@ -11,13 +11,23 @@ import unittest
 from unittest.mock import Mock
 from datetime import datetime
 from mygpo.data.feeddownloader import EpisodeUpdater
+import os
 
 class TestEpisodeUpdater(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        cls.mock_episode = Mock()
+        cls.mock_podcast = Mock()
+        cls.updater = EpisodeUpdater(cls.mock_episode, cls.mock_podcast)
+
+    @classmethod
+    def tearDownClass(cls):
+        project_root = os.path.abspath(os.path.dirname(__file__))
+        write_coverage_to_file(f"{project_root}/coverage.txt", "EpisodeUpdater", cls.updater.report_coverage())
+
     def setUp(self):
-        self.mock_episode = Mock()
-        self.mock_podcast = Mock()
-        self.updater = EpisodeUpdater(self.mock_episode, self.mock_podcast)
+        self.updater.branch_coverage = {1: False, 2: False}  # Reset branch coverage before each test
 
     def test_update_episode(self):
         # Mock data
@@ -55,6 +65,9 @@ class TestEpisodeUpdater(unittest.TestCase):
         self.assertEqual(self.mock_episode.title, 'new-title')
         self.assertTrue(self.mock_episode.save.called)
 
+        self.assertFalse(self.updater.branch_coverage[1])  
+        self.assertFalse(self.updater.branch_coverage[2]) 
+
     def test_mark_outdated(self):
         # Test not outdated
         self.mock_episode.outdated = False
@@ -81,7 +94,24 @@ class TestEpisodeUpdater(unittest.TestCase):
         self.assertFalse(self.mock_episode.save.called)  
 
     def test_report_coverage(self):
-        self.updater.report_coverage()
+        coverage_data = self.updater.report_coverage()
+        self.assertIn(1, coverage_data)  
+        self.assertIn(2, coverage_data) 
+
+def write_coverage_to_file(filename, method_name, branch_coverage):
+    total = len(branch_coverage)
+    num_taken = 0
+    with open(filename, 'w') as file:
+        file.write(f"FILE: {filename}\nMethod: {method_name}\n")
+        for (branch, taken) in enumerate(branch_coverage.items()):
+            if taken:
+                file.write(f"{branch} was taken\n")
+                num_taken+=1
+            else:
+                file.write(f"{branch} was not taken\n")
+        file.write("\n")
+        coverage_level = num_taken / total * 100
+        file.write(f"Total coverage = {coverage_level}%\n")
 
 MEDIUM_URL = "https://farm6.staticflickr.com/5001/1246644888_36863b0856.jpg"
 
