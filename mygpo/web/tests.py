@@ -48,7 +48,7 @@ class EpisodeStatusIconTests(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        project_root = "/mnt/c/Users/moham/Desktop/mygpo/mygpo/web"
+        project_root = os.path.abspath(os.path.dirname(__file__))  # Get the current file's directory
         write_coverage_to_file(f"{project_root}/coverage.txt", "episode_status_icon", get_coverage_data())
 
     def test_no_action(self):
@@ -122,7 +122,7 @@ class EpisodeStatusIconTests(TestCase):
             static('delete.png'),
             "%s on 2022-01-01" % (_("This episode has been deleted")))
         self.assertEqual(result, mark_safe(expected))
-        
+
     def test_unknown_action(self):
         action = Action(action='unknown')
         result = episode_status_icon(action)
