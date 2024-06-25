@@ -49,7 +49,8 @@ class EpisodeStatusIconTests(TestCase):
     @classmethod
     def tearDownClass(cls):
         project_root = os.path.abspath(os.path.dirname(__file__))  # Get the current file's directory
-        write_coverage_to_file(f"{project_root}/coverage.txt", "episode_status_icon", get_coverage_data())
+        coverage_file_path = os.path.join(project_root, '..', 'coverage', 'mohamed', 'episode_status_icon__coverage.txt')
+        write_coverage_to_file(coverage_file_path, "episode_status_icon", get_coverage_data())
 
     def test_no_action(self):
         action = Action()

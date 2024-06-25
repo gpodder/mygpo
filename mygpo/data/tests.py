@@ -24,7 +24,8 @@ class TestEpisodeUpdater(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         project_root = os.path.abspath(os.path.dirname(__file__))
-        write_coverage_to_file(f"{project_root}/coverage.txt", "EpisodeUpdater", cls.updater.report_coverage())
+        coverage_file_path = os.path.join(project_root, '..', 'coverage', 'mohamed', 'EPISODEUPDATER_mark_outdated_coverage.txt')
+        write_coverage_to_file(coverage_file_path, "EpisodeUpdater", cls.updater.report_coverage())
 
     def setUp(self):
         self.updater.branch_coverage = {1: False, 2: False}  # Reset branch coverage before each test

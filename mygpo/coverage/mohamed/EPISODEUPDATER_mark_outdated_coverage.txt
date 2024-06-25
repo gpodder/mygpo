@@ -1,0 +1,6 @@
+FILE: /mnt/c/Users/moham/Desktop/mygpo/mygpo/data/../coverage/mohamed/EPISODEUPDATER_mark_outdated_coverage.txt
+Method: EpisodeUpdater
+0 was taken
+1 was taken
+
+Total coverage = 100.0%
