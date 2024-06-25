@@ -1,17 +1,17 @@
 FILE: /mnt/c/Users/moham/Desktop/mygpo/mygpo/web/../coverage/mohamed/episode_status_icon__coverage.txt
 Method: episode_status_icon
-branch_1 was taken
-branch_2 was taken
-branch_3 was taken
-branch_4 was taken
-branch_5 was taken
-branch_6 was taken
-branch_7 was taken
-branch_8 was taken
-branch_9 was taken
-branch_10 was taken
-branch_11 was taken
-branch_12 was taken
-branch_13 was taken
+Branch 0 was taken
+Branch 1 was taken
+Branch 2 was taken
+Branch 3 was taken
+Branch 4 was taken
+Branch 5 was taken
+Branch 6 was taken
+Branch 7 was taken
+Branch 8 was taken
+Branch 9 was taken
+Branch 10 was taken
+Branch 11 was taken
+Branch 12 was taken
 
 Total coverage = 100.0%

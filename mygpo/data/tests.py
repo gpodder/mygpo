@@ -20,15 +20,24 @@ class TestEpisodeUpdater(unittest.TestCase):
         cls.mock_episode = Mock()
         cls.mock_podcast = Mock()
         cls.updater = EpisodeUpdater(cls.mock_episode, cls.mock_podcast)
+        cls.cumulative_branch_coverage = {"Branch 0": False, "Branch 1": False}
 
     @classmethod
     def tearDownClass(cls):
         project_root = os.path.abspath(os.path.dirname(__file__))
         coverage_file_path = os.path.join(project_root, '..', 'coverage', 'mohamed', 'EPISODEUPDATER_mark_outdated_coverage.txt')
-        write_coverage_to_file(coverage_file_path, "EpisodeUpdater", cls.updater.report_coverage())
+        write_coverage_to_file(coverage_file_path, "EpisodeUpdater", cls.cumulative_branch_coverage)
 
     def setUp(self):
-        self.updater.branch_coverage = {1: False, 2: False}  # Reset branch coverage before each test
+        self.mock_episode.outdated = False  # Ensure `outdated` is properly set for each test
+        self.mock_episode.save.reset_mock()  # Reset mock state
+        self.updater.branch_coverage = {"Branch 0": False, "Branch 1": False}  # Reset branch coverage before each test
+
+    def tearDown(self):
+        # Update cumulative branch coverage
+        for branch, taken in self.updater.branch_coverage.items():
+            if taken:
+                self.cumulative_branch_coverage[branch] = True
 
     def test_update_episode(self):
         # Mock data
@@ -66,53 +75,66 @@ class TestEpisodeUpdater(unittest.TestCase):
         self.assertEqual(self.mock_episode.title, 'new-title')
         self.assertTrue(self.mock_episode.save.called)
 
-        self.assertFalse(self.updater.branch_coverage[1])  
-        self.assertFalse(self.updater.branch_coverage[2]) 
+        self.assertFalse(self.updater.branch_coverage["Branch 0"])  
+        self.assertFalse(self.updater.branch_coverage["Branch 1"]) 
 
     def test_mark_outdated(self):
         # Test not outdated
         self.mock_episode.outdated = False
         self.updater.mark_outdated()
-        
+
         print("Test when episode is not outdated")
+        print("Branch state in outdated", self.updater.branch_coverage)
         self.assertTrue(self.mock_episode.outdated)
         self.assertTrue(self.mock_episode.save.called)
-        self.assertTrue(self.updater.branch_coverage[2])
-        self.assertFalse(self.updater.branch_coverage[1])
+        self.assertTrue(self.updater.branch_coverage["Branch 1"])
+        self.assertFalse(self.updater.branch_coverage["Branch 0"])
 
-        # Reset 
-        self.updater.branch_coverage = {1: False, 2: False}
+        # Update cumulative coverage
+        for branch, taken in self.updater.branch_coverage.items():
+            if taken:
+                self.cumulative_branch_coverage[branch] = True
+
+        # Reset branch coverage for the next test
+        self.updater.branch_coverage = {"Branch 0": False, "Branch 1": False}
+        self.mock_episode.save.reset_mock()  
+        self.mock_episode.outdated = True  # Set mock attribute to True for the next test
 
         # Test outdated
-        self.mock_episode.outdated = True
-        self.mock_episode.save.reset_mock()  
         result = self.updater.mark_outdated()
-        
+
         print("Test when episode is already outdated")
+        print("Branch state in outdated", self.updater.branch_coverage)
         self.assertIsNone(result)
-        self.assertTrue(self.updater.branch_coverage[1])
-        self.assertFalse(self.updater.branch_coverage[2])
+        self.assertTrue(self.updater.branch_coverage["Branch 0"])
+        self.assertFalse(self.updater.branch_coverage["Branch 1"])
         self.assertFalse(self.mock_episode.save.called)  
+
+        # Update cumulative coverage
+        for branch, taken in self.updater.branch_coverage.items():
+            if taken:
+                self.cumulative_branch_coverage[branch] = True
 
     def test_report_coverage(self):
         coverage_data = self.updater.report_coverage()
-        self.assertIn(1, coverage_data)  
-        self.assertIn(2, coverage_data) 
+        self.assertIn("Branch 0", coverage_data)  
+        self.assertIn("Branch 1", coverage_data) 
 
 def write_coverage_to_file(filename, method_name, branch_coverage):
     total = len(branch_coverage)
     num_taken = 0
     with open(filename, 'w') as file:
         file.write(f"FILE: {filename}\nMethod: {method_name}\n")
-        for (branch, taken) in enumerate(branch_coverage.items()):
+        for branch, taken in branch_coverage.items():
             if taken:
                 file.write(f"{branch} was taken\n")
-                num_taken+=1
+                num_taken += 1
             else:
                 file.write(f"{branch} was not taken\n")
         file.write("\n")
         coverage_level = num_taken / total * 100
         file.write(f"Total coverage = {coverage_level}%\n")
+
 
 MEDIUM_URL = "https://farm6.staticflickr.com/5001/1246644888_36863b0856.jpg"
 
