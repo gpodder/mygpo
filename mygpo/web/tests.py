@@ -20,7 +20,7 @@ from mygpo.test import create_auth_string, anon_request
 from django.utils.safestring import mark_safe
 from django.templatetags.static import static
 from django.utils.translation import gettext as _
-from mygpo.web.templatetags.episodes import episode_status_icon, initialize_coverage, report_coverage
+from mygpo.web.templatetags.episodes import episode_status_icon, initialize_coverage, get_coverage_data, write_coverage_to_file
 
 
 import logging
@@ -39,13 +39,17 @@ class MockUtils:
     @staticmethod
     def format_time(time):
         return time
+
 class EpisodeStatusIconTests(TestCase):
 
-    def setUp(self):
-        initialize_coverage()
+    @classmethod
+    def setUpClass(cls):
+        cls.coverage_data = initialize_coverage()
 
-    def tearDown(self):
-        report_coverage()
+    @classmethod
+    def tearDownClass(cls):
+        project_root = "/mnt/c/Users/moham/Desktop/mygpo/mygpo/web"
+        write_coverage_to_file(f"{project_root}/coverage.txt", "episode_status_icon", get_coverage_data())
 
     def test_no_action(self):
         action = Action()
@@ -114,15 +118,16 @@ class EpisodeStatusIconTests(TestCase):
     def test_delete_action(self):
         action = Action(action='delete', timestamp='2022-01-01')
         result = episode_status_icon(action)
-        expected = '<img src="%s" alt="deleted" title="%s"/>' % (
+        expected = '<img src="%s" alt="deleted" title="%s" />' % (
             static('delete.png'),
             "%s on 2022-01-01" % (_("This episode has been deleted")))
         self.assertEqual(result, mark_safe(expected))
-
+        
     def test_unknown_action(self):
         action = Action(action='unknown')
         result = episode_status_icon(action)
         self.assertEqual(result, 'unknown')
+
 
 IMG_PATH1 = os.path.abspath(
     os.path.join(settings.BASE_DIR, "..", "res", "gpoddernet_228.png")

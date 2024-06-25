@@ -12,27 +12,41 @@ from mygpo.web.utils import get_episode_link_target
 
 register = template.Library()
 
-coverage_data = {}
+# Initialize global coverage data
+coverage_data = {
+    'branch_1': 0,
+    'branch_2': 0,
+    'branch_3': 0,
+    'branch_4': 0,
+    'branch_5': 0,
+    'branch_6': 0,
+    'branch_7': 0,
+    'branch_8': 0,
+    'branch_9': 0
+}
 
 def initialize_coverage():
     global coverage_data
-    coverage_data = {
-        'branch_1': 0,
-        'branch_2': 0,
-        'branch_3': 0,
-        'branch_4': 0,
-        'branch_5': 0,
-        'branch_6': 0,
-        'branch_7': 0,
-        'branch_8': 0,
-    }
+    for key in coverage_data.keys():
+        coverage_data[key] = 0
 
-def report_coverage():
-    global coverage_data
-    print("Coverage Report:")
-    for branch, count in coverage_data.items():
-        print(f"{branch}: {'Hit' if count > 0 else 'Missed'}")
+def get_coverage_data():
+    return coverage_data
 
+def write_coverage_to_file(filename, method_name, branch_coverage):
+    total = len(branch_coverage)
+    num_taken = 0
+    with open(filename, 'w') as file:
+        file.write(f"FILE: {filename}\nMethod: {method_name}\n")
+        for index, (branch, taken) in enumerate(branch_coverage.items()):
+            if taken:
+                file.write(f"{branch} was taken\n")
+                num_taken += 1
+            else:
+                file.write(f"{branch} was not taken\n")
+        file.write("\n")
+        coverage_level = num_taken / total * 100
+        file.write(f"Total coverage = {coverage_level}%\n")
 
 @register.filter
 def episode_status_text(episode):
@@ -59,8 +73,7 @@ def episode_status_text(episode):
 
     return _("Unknown status")
 
-
-@register.filter()
+@register.filter
 def episode_status_icon(action):
     global coverage_data
 
@@ -70,7 +83,6 @@ def episode_status_icon(action):
             staticfiles_storage.url("nothing.png"),
             _("Unplayed episode"),
         )
-
     else:
         coverage_data['branch_2'] += 1
         date_string = (_(" on %s") % (action.timestamp)) if action.timestamp else ""
@@ -124,7 +136,8 @@ def episode_status_icon(action):
                 ),
             )
         elif action.action == "delete":
-            s = '<img src="%s" alt="deleted" title="%s"/>' % (
+            coverage_data['branch_9'] += 1
+            s = '<img src="%s" alt="deleted" title="%s" />' % (
                 staticfiles_storage.url("delete.png"),
                 "%s%s%s"
                 % (_("This episode has been deleted"), date_string, device_string),
