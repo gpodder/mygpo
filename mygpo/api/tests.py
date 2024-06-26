@@ -584,7 +584,7 @@ class SimpleAPITests(unittest.TestCase):
     #     validate_spec_url("file://" + os.path.abspath("./mygpo/api/openapi.yaml"))
 class GetUrlsTest(unittest.TestCase):
 
-    @unittest.patch('mygpo.api.advanced.episode.normalize_feed_url')
+    @patch('mygpo.api.advanced.episode.normalize_feed_url')
     def test_get_urls(self, mock_normalize_feed_url):
         branch_coverage_get = [False] * 8
         testobj = ChaptersAPI()

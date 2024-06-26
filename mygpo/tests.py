@@ -1,5 +1,5 @@
 import unittest
-from utils import normalize_url
+from .utils import normalize_url
 
 class TestNormalizeFeedURL(unittest.TestCase):
     def test_normalize_url(self):
