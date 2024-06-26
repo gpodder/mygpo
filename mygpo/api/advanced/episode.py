@@ -90,28 +90,42 @@ class ChaptersAPI(APIView):
 
         return (start, end)
 
-    def get_urls(self, body):
+    def get_urls(self, body, branch_coverage_get):
         """Parse and normalize the URLs from the request"""
         podcast_url = body.get("podcast", "")
         episode_url = body.get("episode", "")
 
         if not podcast_url:
+            branch_coverage_get[0] = True
             raise RequestException("Podcast URL missing")
+        else:
+            branch_coverage_get[1] = True
 
         if not episode_url:
+            branch_coverage_get[2] = True
             raise RequestException("Episode URL missing")
+        else:
+            branch_coverage_get[3] = True
 
         update_urls = []
 
         # podcast sanitizing
         s_podcast_url = normalize_feed_url(podcast_url)
+        print(podcast_url)
+        print(s_podcast_url)
         if s_podcast_url != podcast_url:
+            branch_coverage_get[4] = True
             update_urls.append((podcast_url, s_podcast_url or ""))
+        else:
+            branch_coverage_get[5] = True
 
         # episode sanitizing
         s_episode_url = normalize_feed_url(episode_url, "episode")
         if s_episode_url != episode_url:
+            branch_coverage_get[6] = True
             update_urls.append((episode_url, s_episode_url or ""))
+        else:
+            branch_coverage_get[7] = True
 
         return s_podcast_url, s_episode_url, update_urls
 

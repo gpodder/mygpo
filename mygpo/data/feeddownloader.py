@@ -471,6 +471,7 @@ class EpisodeUpdater(object):
     def __init__(self, episode, podcast):
         self.episode = episode
         self.podcast = podcast
+        self.branch_coverage = {"Branch 0": False, "Branch 1": False}
 
     def update_episode(self, parsed_episode):
         """updates "episode" with the data from "parsed_episode" """
@@ -549,12 +550,20 @@ class EpisodeUpdater(object):
     def mark_outdated(self):
         """marks the episode outdated if its not already"""
         if self.episode.outdated:
+            self.branch_coverage["Branch 0"] = True  # Branch 1 taken
+            print("Branch 0 taken: Episode is already outdated")
             return None
-
+        else:
+            self.branch_coverage["Branch 1"] = True  # Branch 2 taken
+            print("Branch 1 taken: Episode is not outdated")
+        # No hidden branches
+        print("Branch state in outdated", self.branch_coverage)
         self.episode.outdated = True
         self.episode.last_update = datetime.utcnow()
         self.episode.save()
 
+    def report_coverage(self):
+       return self.branch_coverage 
 
 def file_basename_no_extension(filename):
     """Returns filename without extension

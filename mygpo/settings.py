@@ -40,14 +40,15 @@ ADMINS = re.findall(r"\s*([^<]+) <([^>]+)>\s*", os.getenv("ADMINS", ""))
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mygpo_database',   # new database name
-        'USER': 'mygpo_user',       # new database user
-        'PASSWORD': 'newpassword',  # new database user's password
-        'HOST': 'localhost',
-        'PORT': '5432',
+        "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "mygpo",
+        "USER": "mygpo_user",
+        "PASSWORD": "mygpo_password",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
+    #"default": dj_database_url.config(default="postgres://mygpo:mygpo@localhost/mygpo")
 }
     #"default": dj_database_url.config(default="postgres://mygpo:mygpo@localhost/mygpo")
 
@@ -113,9 +114,11 @@ MEDIA_URL = "/media/"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            os.path.join(BASE_DIR, 'templates')
+        ],
         "OPTIONS": {
-            "debug": DEBUG,
+            "debug": True,
             "context_processors": [
                 "django.contrib.auth.context_processors.auth",
                 "django.template.context_processors.debug",

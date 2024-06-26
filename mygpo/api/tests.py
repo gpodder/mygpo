@@ -17,6 +17,8 @@ from django.test import RequestFactory
 from openapi_spec_validator import validate_spec_url
 from jsonschema import ValidationError
 
+from mygpo.api import RequestException
+from mygpo.api.advanced.episode import ChaptersAPI
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.api.advanced import episodes
 from mygpo.api.opml import Exporter, Importer
@@ -580,3 +582,48 @@ class SimpleAPITests(unittest.TestCase):
 
     # def test_api_definition_validity(self):
     #     validate_spec_url("file://" + os.path.abspath("./mygpo/api/openapi.yaml"))
+class GetUrlsTest(unittest.TestCase):
+
+    @unittest.patch('mygpo.api.advanced.episode.normalize_feed_url')
+    def test_get_urls(self, mock_normalize_feed_url):
+        branch_coverage_get = [False] * 8
+        testobj = ChaptersAPI()
+
+        # branch 0
+        body = {"podcast": "", "episode": ""}
+        with self.assertRaises(RequestException):
+            testobj.get_urls(body, branch_coverage_get)
+
+        # branch 1, 2
+        body = {"podcast": "podcast_url", "episode": ""}
+        with self.assertRaises(RequestException):
+            testobj.get_urls(body, branch_coverage_get)
+
+        mock_normalize_feed_url.return_value = "norm_url"
+        # branch 1, 3, 5, 7 different url
+        body = {"podcast": "dif_url", "episode": "dif_url"}
+        result = testobj.get_urls(body, branch_coverage_get)
+        self.assertEqual(result, ("norm_url", "norm_url", [("dif_url", "norm_url"), ("dif_url", "norm_url")]))
+
+
+        mock_normalize_feed_url.return_value = "same_url"
+        # branch 1,3, 4 and 6 same podcast and episode url
+        body = {"podcast": "same_url", "episode": "same_url"}
+        result = testobj.get_urls(body, branch_coverage_get)
+        self.assertEqual(result, ("same_url", "same_url", []))
+
+        total = len(branch_coverage_get)
+        num_taken = 0
+        path = '/mnt/c/Users/andre/Documents/VUA/year_1/6period/SEP/loctests/get_urls.txt'
+        with open(path, 'w') as file:
+            file.write(f"FILE: episode.py\nMethod: get_urls\n\n")
+            for index, coverage in enumerate(branch_coverage_get):
+                if coverage:
+                    file.write(f"Branch {index} was taken\n")
+                    num_taken += 1
+                else:
+                    file.write(f"Branch {index} was not taken\n")
+            file.write(f"\n")
+            coverage_level = num_taken / total * 100
+            file.write(f"Total coverage: {coverage_level}%\n")
+
