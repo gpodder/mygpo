@@ -18,6 +18,14 @@ from django.contrib.auth.models import User
 from mygpo.podcasts.models import Podcast, Episode, Slug, Tag
 from mygpo.web.logo import CoverArt, get_logo_url
 from mygpo.test import create_auth_string, anon_request
+
+
+
+from unittest.mock import Mock
+from django.utils.translation import gettext as _
+from mygpo.web.templatetags.episodes import episode_status_text
+
+
 import logging
 
 from .templatetags.devices import device_icon
@@ -312,7 +320,6 @@ class PublisherPageTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
 
-
 class DeviceTest(unittest.TestCase):
     @patch('mygpo.web.templatetags.devices.staticfiles_storage')
     @patch('mygpo.web.templatetags.devices.mark_safe')
@@ -355,3 +362,88 @@ class DeviceTest(unittest.TestCase):
 
         write_coverage_report("/home/hussein/sep/fork/mygpo/coverage/hussein/device_icon_coverage.txt", coverage,
                               "web/templatetags/devices.py", "device_icons")
+
+class TestEpisodeStatusText(TestCase):
+    def test_episode_status_text(self):
+        coverage = [False] * 12
+
+        # Create a mock device with a name attribute
+        MockDevice = Mock()
+        MockDevice.name = "Device1"
+
+        # Create a mock Episode object with the mock device
+        MockEpisode = Mock()
+        MockEpisode.action = "new"  # Example action, change as needed
+        MockEpisode.device = MockDevice
+
+
+        # Test branch 0
+        MockEpisode.action = None
+        self.assertEqual(episode_status_text(MockEpisode, coverage), "")
+
+        #Test branch 1
+        MockEpisode.action = ""
+        episode_status_text(MockEpisode, coverage), ""
+
+        # Test branch 2
+        # Test episode with action "new"
+        MockEpisode.action = "new"
+        self.assertEqual(episode_status_text(MockEpisode, coverage), "New episode")
+
+        # Test branch 3 4
+        # Test download action with specific device
+        MockEpisode.action = "download"
+        self.assertEqual(episode_status_text(MockEpisode, coverage), "Downloaded to Device1")
+
+        # Test branch 3 5 
+        # Test download action without specific device 
+        MockEpisode.action = "download"
+        MockDevice.name = None
+        self.assertEqual(episode_status_text(MockEpisode, coverage), "Downloaded")
+
+        # Test branch 6 7
+        # Test play action with specific device
+        MockEpisode.action = "play"
+        MockDevice.name = "Device1"
+        self.assertEqual(episode_status_text(MockEpisode, coverage), "Played on Device1")
+
+        # Test branch 6 8
+        # Test play action without specific device
+        MockEpisode.action = "play"
+        MockDevice.name = None
+        self.assertEqual(episode_status_text(MockEpisode, coverage), "Played")
+
+        # Test branch 9 10
+        # Test delete action with specific device
+        MockEpisode.action = "delete"
+        MockDevice.name = "Device1"
+        self.assertEqual(episode_status_text(MockEpisode, coverage), "Deleted on Device1")
+
+        # Test branch 9 11
+        # Test delete action without specific device
+        MockEpisode.action = "delete"
+        MockDevice.name = None
+        self.assertEqual(episode_status_text(MockEpisode, coverage), "Deleted")
+
+        write_coverage_to_file(
+            "/Users/samuelpower/Desktop/SEP2/coverage.txt",
+            "episode status",
+            coverage,
+        )
+
+
+def write_coverage_to_file(filename, method_name, branch_coverage):
+    total = len(branch_coverage)
+    num_taken = 0
+    with open(filename, 'w') as file:
+        file.write(f"FILE: {filename}\nMethod: {method_name}\n")
+        for index, coverage in enumerate(branch_coverage):
+            if coverage:
+                file.write(f"Branch {index} was taken\n")
+                num_taken += 1
+            else:
+                file.write(f"Branch {index} was not taken\n")
+        file.write("\n")
+        coverage_level = num_taken/total * 100
+        file.write(f"Total coverage = {coverage_level}%\n")
+
