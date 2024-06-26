@@ -1,5 +1,5 @@
-FILE: /home/hussein/sep/fork/mygpo/mygpo/web/../coverage/mohamed/episode_status_icon__coverage.txt
-Method: episode_status_icon
+FILE: coverage/manual_coverage/samuel_episode_status_text_cov.txt
+Method: episode_status_text
 Branch 0 was taken
 Branch 1 was taken
 Branch 2 was taken
@@ -12,6 +12,5 @@ Branch 8 was taken
 Branch 9 was taken
 Branch 10 was taken
 Branch 11 was taken
-Branch 12 was taken
 
 Total coverage = 100.0%

@@ -1,5 +1,6 @@
-FILE: /home/hussein/sep/fork/mygpo/mygpo/web/../coverage/mohamed/episode_status_icon__coverage.txt
-Method: episode_status_icon
+FILE: userfeeds/auth.py
+Method: view_or_basic_auth
+
 Branch 0 was taken
 Branch 1 was taken
 Branch 2 was taken
@@ -13,5 +14,7 @@ Branch 9 was taken
 Branch 10 was taken
 Branch 11 was taken
 Branch 12 was taken
+Branch 13 was taken
+Branch 14 was taken
 
-Total coverage = 100.0%
+Total coverage: 100.0%

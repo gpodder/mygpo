@@ -1,4 +1,4 @@
-FILE: /home/hussein/sep/fork/mygpo/mygpo/web/../coverage/mohamed/episode_status_icon__coverage.txt
+FILE: coverage/manual_coverage/mohamed_episode_status_icon_cov.txt
 Method: episode_status_icon
 Branch 0 was taken
 Branch 1 was taken

@@ -1,0 +1,10 @@
+FILE: coverage/manual_coverage/andi_device_icons_cov.txt
+Method: device_icon
+Branch 0 was taken
+Branch 1 was taken
+Branch 2 was taken
+Branch 3 was taken
+Branch 4 was taken
+Branch 5 was taken
+
+Total coverage = 100.0%

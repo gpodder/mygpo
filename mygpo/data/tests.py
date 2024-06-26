@@ -25,7 +25,7 @@ class TestEpisodeUpdater(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         project_root = os.path.abspath(os.path.dirname(__file__))
-        coverage_file_path = os.path.join(project_root, '..', 'coverage', 'mohamed', 'EPISODEUPDATER_mark_outdated_coverage.txt')
+        coverage_file_path = "coverage/manual_coverage/mohamed_EpisodeUpdater_cov.txt"
         write_coverage_to_file(coverage_file_path, "EpisodeUpdater", cls.cumulative_branch_coverage)
 
     def setUp(self):

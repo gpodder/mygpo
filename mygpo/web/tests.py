@@ -59,8 +59,7 @@ class EpisodeStatusIconTests(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        project_root = os.path.abspath(os.path.dirname(__file__))  # Get the current file's directory
-        coverage_file_path = os.path.join(project_root, '..', 'coverage', 'mohamed', 'episode_status_icon__coverage.txt')
+        coverage_file_path = "coverage/manual_coverage/mohamed_episode_status_icon_cov.txt"
         write_coverage_to_file(coverage_file_path, "episode_status_icon", get_coverage_data())
 
     def test_no_action(self):
@@ -468,8 +467,8 @@ class DeviceTest(unittest.TestCase):
         expected_html = ""
         self.assertEqual(result, expected_html)
 
-        write_coverage_report("/home/hussein/sep/fork/mygpo/coverage/hussein/device_icon_coverage.txt", coverage,
-                              "web/templatetags/devices.py", "device_icons")
+        write_coverage_to_file("coverage/manual_coverage/andi_device_icons_cov.txt", "device_icon", coverage)
+                              
 
 class TestEpisodeStatusText(TestCase):
     def test_episode_status_text(self):
@@ -534,8 +533,8 @@ class TestEpisodeStatusText(TestCase):
         self.assertEqual(episode_status_text(MockEpisode, coverage), "Deleted")
 
         write_coverage_to_file(
-            "/Users/samuelpower/Desktop/SEP2/coverage.txt",
-            "episode status",
+            "coverage/manual_coverage/samuel_episode_status_text_cov.txt",
+            "episode_status_text",
             coverage,
         )
 
