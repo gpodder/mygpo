@@ -188,3 +188,5 @@ def get_logo_url(podcast, size):
     else:
         filename = "podcast-%d.png" % (hash(podcast.title) % 5,)
         return staticfiles_storage.url("logo/{0}".format(filename))
+    
+    

@@ -6,7 +6,7 @@ import dj_database_url
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 try:
-    from psycopg2cffi import compat
+    from psycopg2 import compat
 
     compat.register()
 except ImportError:
@@ -50,6 +50,8 @@ DATABASES = {
     }
     #"default": dj_database_url.config(default="postgres://mygpo:mygpo@localhost/mygpo")
 }
+    #"default": dj_database_url.config(default="postgres://mygpo:mygpo@localhost/mygpo")
+
 
 
 _USE_GEVENT = get_bool("USE_GEVENT", False)
@@ -229,7 +231,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 # TODO: use (default) JSON serializer for security
 # this would currently fail as we're (de)serializing datetime objects
 # https://docs.djangoproject.com/en/1.5/topics/http/sessions/#session-serialization
-SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
