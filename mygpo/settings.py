@@ -3,6 +3,7 @@ import sys
 import os.path
 import dj_database_url
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 try:
     from psycopg2cffi import compat
@@ -39,14 +40,15 @@ ADMINS = re.findall(r"\s*([^<]+) <([^>]+)>\s*", os.getenv("ADMINS", ""))
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mygpo_database',
-        'USER': 'mygpo_user',
-        'PASSWORD': 'newpassword',
-        'HOST': 'localhost',
-        'PORT': '5342',
+        "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "mygpo",
+        "USER": "mygpo_user",
+        "PASSWORD": "mygpo_password",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
+    #"default": dj_database_url.config(default="postgres://mygpo:mygpo@localhost/mygpo")
 }
 
 
@@ -110,9 +112,11 @@ MEDIA_URL = "/media/"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            os.path.join(BASE_DIR, 'templates')
+        ],
         "OPTIONS": {
-            "debug": DEBUG,
+            "debug": True,
             "context_processors": [
                 "django.contrib.auth.context_processors.auth",
                 "django.template.context_processors.debug",
@@ -241,10 +245,10 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "")
 
 SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
 
-SECRET_KEY = os.getenv("SECRET_KEY", "")
+SECRET_KEY = os.getenv("SECRET_KEY", "default_test_key_for_testing")
 
-if "pytest" in sys.argv[0]:
-    SECRET_KEY = "test"
+if "test" in sys.argv or "pytest" in sys.argv[0]:
+    SECRET_KEY = "test_secret_key"
 
 GOOGLE_ANALYTICS_PROPERTY_ID = os.getenv("GOOGLE_ANALYTICS_PROPERTY_ID", "")
 
@@ -350,8 +354,10 @@ DEFAULT_BASE_URL = os.getenv("DEFAULT_BASE_URL", "")
 
 ### Celery
 
-CELERY_BROKER_URL = os.getenv("BROKER_URL", "redis://localhost")
-CELERY_RESULT_BACKEND = "django-db"
+# CELERY_BROKER_URL = os.getenv("BROKER_URL", "redis://localhost")
+# CELERY_RESULT_BACKEND = "django-db"
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 CELERY_RESULT_EXPIRES = 60 * 60  # 1h expiry time in seconds
 
