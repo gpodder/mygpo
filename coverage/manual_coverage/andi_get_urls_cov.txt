@@ -1,0 +1,12 @@
+FILE: coverage/manual_coverage/andi_get_urls_cov.txt
+Method: get_urls
+Branch 0 was taken
+Branch 1 was taken
+Branch 2 was taken
+Branch 3 was taken
+Branch 4 was taken
+Branch 5 was taken
+Branch 6 was taken
+Branch 7 was taken
+
+Total coverage = 100.0%

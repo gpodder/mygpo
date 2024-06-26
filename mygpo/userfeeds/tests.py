@@ -100,7 +100,7 @@ class TestViewOrBasicAuth(unittest.TestCase):
         self.assertIsNotNone(response)
         self.assertIsInstance(response, MagicMock)
 
-        write_coverage_report("/home/hussein/sep/fork/mygpo/coverage/hussein/auth/view_or_basicauth_coverage.txt", branch_coverage)
+        write_coverage_report("coverage/manual_coverage/hussein_view_or_basicauth_coverage.txt", branch_coverage)
 
         
 

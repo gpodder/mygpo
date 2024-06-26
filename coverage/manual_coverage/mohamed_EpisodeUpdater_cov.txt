@@ -1,0 +1,6 @@
+FILE: coverage/manual_coverage/mohamed_EpisodeUpdater_cov.txt
+Method: EpisodeUpdater
+Branch 0 was taken
+Branch 1 was taken
+
+Total coverage = 100.0%

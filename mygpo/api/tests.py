@@ -115,23 +115,6 @@ class AdvancedAPITests(unittest.TestCase):
         return True
 
 
-def write_coverage_report(path, branch_coverage):
-
-    total = len(branch_coverage)
-    num_taken = 0
-
-    with open(path, 'w') as file:
-        file.write(f"FILE: api/legacy\nMethod: upload\n\n")
-        for index, coverage in enumerate(branch_coverage):
-            if coverage:
-                file.write(f"Branch {index} was taken\n")
-                num_taken += 1
-            else:
-                file.write(f"Branch {index} was not taken\n")
-        file.write(f"\n")
-        coverage_level = num_taken/total * 100
-        file.write(f"Total coverage = {coverage_level}%\n")
-
 class SubscriptionAPITests(unittest.TestCase):
     """Tests the Subscription API"""
 
@@ -274,13 +257,10 @@ class SubscriptionAPITests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode('utf-8'), "@PROTOERROR")
 
-        write_coverage_report("/home/hussein/sep/fork/mygpo/coverage/hussein/legacy/upload_coverage.txt", branch_coverage)
-
-
-
-        
-
-    
+        write_coverage_to_file(
+            "coverage/manual_coverage/hussein_upload_cov.txt",
+            "upload",
+            branch_coverage)
 
 
 class DirectoryTest(TestCase):
@@ -582,6 +562,8 @@ class SimpleAPITests(unittest.TestCase):
 
     # def test_api_definition_validity(self):
     #     validate_spec_url("file://" + os.path.abspath("./mygpo/api/openapi.yaml"))
+
+
 class GetUrlsTest(unittest.TestCase):
 
     @patch('mygpo.api.advanced.episode.normalize_feed_url')
@@ -612,18 +594,24 @@ class GetUrlsTest(unittest.TestCase):
         result = testobj.get_urls(body, branch_coverage_get)
         self.assertEqual(result, ("same_url", "same_url", []))
 
-        total = len(branch_coverage_get)
-        num_taken = 0
-        path = '/mnt/c/Users/andre/Documents/VUA/year_1/6period/SEP/loctests/get_urls.txt'
-        with open(path, 'w') as file:
-            file.write(f"FILE: episode.py\nMethod: get_urls\n\n")
-            for index, coverage in enumerate(branch_coverage_get):
-                if coverage:
-                    file.write(f"Branch {index} was taken\n")
-                    num_taken += 1
-                else:
-                    file.write(f"Branch {index} was not taken\n")
-            file.write(f"\n")
-            coverage_level = num_taken / total * 100
-            file.write(f"Total coverage: {coverage_level}%\n")
+        write_coverage_to_file(
+            "coverage/manual_coverage/andi_get_urls_cov.txt",
+            "get_urls",
+            branch_coverage_get)
 
+
+
+def write_coverage_to_file(filename, method_name, branch_coverage):
+    total = len(branch_coverage)
+    num_taken = 0
+    with open(filename, 'w') as file:
+        file.write(f"FILE: {filename}\nMethod: {method_name}\n")
+        for index, coverage in enumerate(branch_coverage):
+            if coverage:
+                file.write(f"Branch {index} was taken\n")
+                num_taken += 1
+            else:
+                file.write(f"Branch {index} was not taken\n")
+        file.write("\n")
+        coverage_level = num_taken/total * 100
+        file.write(f"Total coverage = {coverage_level}%\n")

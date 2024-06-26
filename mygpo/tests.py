@@ -3,7 +3,7 @@ from .utils import normalize_url
 
 class TestNormalizeFeedURL(unittest.TestCase):
     def test_normalize_url(self):
-        coverage = [False] * 11
+        coverage = [False] * 12
         #     def _init_(self, scheme=None, netloc=None, path=None, query=None, fragment=None):
         # Test branch 0
         url = " "
@@ -37,8 +37,8 @@ class TestNormalizeFeedURL(unittest.TestCase):
         url = "gopher://example.com"
         self.assertEqual(normalize_url(url, coverage), None)
         write_coverage_to_file(
-            "/Users/samuelpower/Desktop/SEP2/coverage.txt",
-            "normalize feed url",
+            "coverage/manual_coverage/samuel_normalize_feed_url_cov.txt",
+            "normalize_feed_url",
             coverage,
         )
 
