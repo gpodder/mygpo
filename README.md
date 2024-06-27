@@ -62,6 +62,28 @@ The function was not being tested initially, and so produced no coverage results
 
 ![View_or_basicauth Coverage Results](coverage/report_images/hussein_v_or_ba_cov_results.png "View_or_basicauth Coverage Results")
 
+#### Mohamed Hussain Shareef
+
+##### Function 1: episode_status_icon in mygpo/web/templatetags/episodes.py
+
+[Link to commit summary (BRANCH INSTRUMENTATION)](https://github.com/HusseinSarrar05/mygpo/pull/4/files#diff-761057704aefb718d8b927b536b11bd3d11541447d027a3d93449dae55e132e4)
+
+The function had 0% coverage initially, so it produced no coverage results. Check below to see the coverage results after:
+[Link to commit summary (COVERAGE RESULTS)](https://github.com/HusseinSarrar05/mygpo/pull/4/files#diff-761057704aefb718d8b927b536b11bd3d11541447d027a3d93449dae55e132e4)
+
+Screenshot:
+![image](https://github.com/HusseinSarrar05/mygpo/assets/45093174/1fe51550-c8ad-43d8-b693-d30939e2253c)
+
+##### Function 2: EpisodeUpdater in mygpo/data/feeddownloader.py
+
+[Link to commit summary (BRANCH INSTRUMENTATION)](https://github.com/HusseinSarrar05/mygpo/pull/4/files#diff-8c15d9291fda719b8caedcd25c94db3dbdbe1e36f76d43b9254249b58ea5f321)
+
+The function had 0% coverage initially, so it produced no coverage results. Check below to see the coverage results after:
+[Link to commit summary (COVERAGE RESULTS)](https://github.com/HusseinSarrar05/mygpo/pull/4/files#diff-f84ea5bd798f6c5f42ba9c634e519bbf37b0999055f209097f5f711561868bde)
+
+Screenshot:
+![image](https://github.com/HusseinSarrar05/mygpo/assets/45093174/c1d54295-f1cb-4a7e-8f03-02f00acc74c5)
+
 ## Coverage improvement
 
 All coverage results were written to **txt** files
@@ -110,6 +132,25 @@ The function was not being tested at all and had 0% coverage.
 
 After creating a new test for it, the coverage achieved was **100%**. All different logical paths through the function were taken, and the results were asserted.
 
+#### Mohamed Hussain Shareef
+
+##### Test for Function 1: episode_status_icon in mygpo/web/templatetags/episodes.py
+
+[Link to commit summary with tests](https://github.com/HusseinSarrar05/mygpo/pull/4/files#diff-9b165d03e2d7ee3b32727f3c6a51236d18e30bb4a53aef2b9dd12ecb0ec6578e)
+
+This can be found in **mygpo/web/tests.py**. 
+The function previously had no testing, and had 0% coverage. 
+After creating new tests for it, 100% coverage was achieved. All branches were taken, and we did different testing scenarios to check for proper statuy icon behaviour. 
+See previous section for the coverage results produced after testing. 
+
+##### Test for Function 2: EpisodeUpdater in mygpo/data/feeddownloader.py
+
+This can be found in **mygpo/data/tests.py**
+
+[Link to commit summary with tests](https://github.com/HusseinSarrar05/mygpo/pull/4/files#diff-9866422a779a64f57d1d1143dd58fb30646268710cc5ac465c1b65270b58487c)
+The function previously had no testing, and had 0% coverage. 
+After creating new tests for it, 100% coverage was achieved. All branches were taken, had to test if it would properly mark episodes as outdated and have proper updating functionality using mock episode objects and assertions. 
+See previous section for the coverage results produced after testing. 
 
 ### Overall
 
