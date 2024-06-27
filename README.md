@@ -77,7 +77,7 @@ Screenshot:
 There was no test provided by the original repository for the get_urls function. 
 Thus, we can state the branch coverage was 0%.
 
-#### Function 2: device_icon in **mygpo/web/templatetags/devices.py 
+#### Function 2: device_icon in **mygpo/web/templatetags/devices.py**
 
 [Link to device_icon instrumentation](https://github.com/gpodder/mygpo/commit/b04eecb0e85f97a632e813147dac6ea2184b99c5)
 
@@ -117,7 +117,7 @@ The function was not being tested at all and had 0% coverage.
 Coverage results:
 ![Upload Coverage Results](coverage/report_images/hussein_upload_cov_results.png "Upload Coverage Results")
 
-After creating a new test for it, the coverage achieved was **100%**. All different logical paths through the function were taken, and the results were asserted.
+After creating a new test for it, the coverage achieved was **100%**. All different logical paths through the function were taken, and the results were asserted. Trials were run with incomplete data, data that guaranted no changes, and data that did.
 
 #### Test for function 2: view_or_basicauth
 
@@ -129,7 +129,7 @@ The function was not being tested at all and had 0% coverage.
 Coverage results:
 ![View_or_basicauth Coverage Results](coverage/report_images/hussein_v_or_ba_cov_results.png "View_or_basicauth Coverage Results")
 
-After creating a new test for it, the coverage achieved was **100%**. All different logical paths through the function were taken, and the results were asserted.
+After creating a new test for it, the coverage achieved was **100%**. All different logical paths through the function were taken, and the results were asserted. Different authentication headers were tried, along with valid, invlaid, and incorrect validation credentials.
 
 ### Mohamed Hussain Shareef
 
@@ -176,7 +176,7 @@ After creating the new tests, 100% branch coverage was achieved.
 
 ### Samuel Power
 
-#### Function 1: **episode_status_text** in mgpo/web/templatetags/episodes.py**
+#### Function 1: **episode_status_text** in **mgpo/web/templatetags/episodes.py**
 
 [Link to commit](https://github.com/HusseinSarrar05/mygpo/pull/2/commits/e95c9851dc64d98c2d3ad6741954784b647a7085)
 
