@@ -84,6 +84,36 @@ The function had 0% coverage initially, so it produced no coverage results. Chec
 Screenshot:
 ![image](https://github.com/HusseinSarrar05/mygpo/assets/45093174/c1d54295-f1cb-4a7e-8f03-02f00acc74c5)
 
+#### Samuel Power
+
+<Function 1 name>
+
+##### Function 1: **episode_status_text** in mgpo/web/templatetags/episodes.py**
+
+<Show a patch(diff) or provide a link to a commit showing the instrumented function>
+
+[Link to commit](https://github.com/HusseinSarrar05/mygpo/pull/2/commits/e95c9851dc64d98c2d3ad6741954784b647a7085)
+
+**NOTE:** This commit is not the final commit, but the first one where branch coverage is completed. Please navigate to pull request to see full overview of changes for this function.
+
+![View_or_basicauth Coverage Results](coverage/report_images/Samuel_coverage_episodes.png "episode_status_text")
+
+<Provide a screenshot of the coverage results output by the instrumentation>
+
+The function was not being tested initially, and so produced no coverage results.
+
+
+<Provide the same information for function 2>
+
+###### Function 2: **normalize_feed_url** in **mygpo/utils.py**
+
+[Link to commit](https://github.com/HusseinSarrar05/mygpo/pull/2/commits/cbe2a50c129e3f13be3dfd0dfc3d287acd0cdb24)
+
+**NOTE:** Please note that the function was duplicated for testing purposes, and renamed to normalize_url. This was done because python does not support function overloading, which would have otherwise been necessary due to the functions high number of dependents contained in other files. 
+
+![View_or_basicauth Coverage Results](coverage/report_images/Samuel_coverage_utils.png "normalize_feed_url Coverage Results")
+
+
 ## Coverage improvement
 
 All coverage results were written to **txt** files
