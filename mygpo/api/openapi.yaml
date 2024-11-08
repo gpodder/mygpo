@@ -496,7 +496,7 @@ paths:
     get:
       tags:
       - "Subscriptions"
-      summary: "Update Device Data"
+      summary: "Get Subscriptions of Device"
       parameters:
       - name: "username"
         in: "path"
@@ -1013,7 +1013,7 @@ components:
           description: "Time in seconds for which the values in this file can be considered valid."
     Format:
       type: "string"
-      enum: 
+      enum:
       - "json"
       - "xml"
       - "opml"
