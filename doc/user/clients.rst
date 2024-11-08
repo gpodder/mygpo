@@ -14,7 +14,7 @@ Name                  Status      gpodder.net features                          
 `AntennaPod`_         Active      Directory, Search, Subscription sync, Episode Action sync   GPL 3     `How to synchronize between devices`_
 `Escapepod`_          Active      Search                                                      MIT
 `Listen Up Free`_     Active      sync, subscription, search
-`Podcast Addict`_     Active      none                                                                  `Podcast Addict export script`_
+`Podcast Addict`_     Active      none
 `Podkicker`_          Active      none
 `Podax`_              Abandoned   Subscription sync                                           BSD
 `Volksempfänger`_     Abandoned   Podcast search                                              ISC
@@ -149,7 +149,6 @@ Nokia Podcasting       -       Subscription service    GPL         `Podcasting D
 .. _Feed Farmer: https://play.google.com/store/apps/details?id=com.escape.FeedFarmer&hl=en
 .. _Podcatcher Deluxe: http://www.podcatcher-deluxe.com/
 .. _Podcast Addict: https://play.google.com/store/apps/details?id=com.bambuna.podcastaddict
-.. _Podcast Addict export script: http://www.mameau.com/gpodder-podcast-import-script/
 .. _Podkicker: https://play.google.com/store/apps/details?id=ait.podka&hl=de
 .. _SoundWaves: https://github.com/bottiger/SoundWaves
 .. _Mopidy-Podcast-GPodder: http://github.com/tkem/mopidy-podcast-gpodder/
