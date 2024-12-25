@@ -169,7 +169,7 @@ class EpisodeHistoryEntry(models.Model):
             stopped=stopped,
         ).exists()
         if exists:
-            logger.warning(
+            logger.debug(
                 "Trying to save duplicate {cls} for {user} "
                 "/ {episode}".format(cls=cls, user=user, episode=episode)
             )
