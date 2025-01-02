@@ -168,3 +168,32 @@ directory with
 
 If you want to run a production server, check out `Deploying Django
 <https://docs.djangoproject.com/en/dev/howto/deployment/>`_.
+
+Running with Docker
+-------------------
+
+There is a multi-stage docker definition. To build the image for local testing run
+
+.. code-block:: bash
+
+    docker build --target dev -t gpodder.dev -f Dockerfile . 
+
+This will build the `dev` stage.
+
+Next, you need to define the configuration to be passed into the container. The simplest is to run
+
+.. code-block:: bash
+
+    make dev-config
+
+Next, you need to run the migrations:
+
+.. code-block:: bash
+
+    docker run -ti -v ${PWD}/envs/dev:/app/envs/dev gpodder.dev envdir envs/dev python manage.py migrate
+
+Finally, you can start the development server:
+
+.. code-block:: bash
+
+    docker run --rm -ti -v ${PWD}/envs/dev:/app/envs/dev gpodder.dev
