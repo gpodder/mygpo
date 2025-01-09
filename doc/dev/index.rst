@@ -27,6 +27,7 @@ Contents
     :maxdepth: 1
 
     installation
+    kubernetes
     postgres-setup
     libraries
     configuration

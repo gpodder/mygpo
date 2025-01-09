@@ -1,0 +1,11 @@
+.github/*
+.tx/*
+conf/*
+doc/*
+envs/*
+res/*
+tools/*
+.gitignore
+.travis
+Procfile
+run.sh
