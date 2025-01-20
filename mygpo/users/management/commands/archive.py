@@ -12,6 +12,7 @@ from functools import wraps
 from time import perf_counter
 from uuid import UUID
 
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
@@ -29,7 +30,7 @@ from mygpo.publisher.models import PublishedPodcast
 from mygpo.suggestions.models import PodcastSuggestion
 from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.subscriptions.models import Subscription
-from mygpo.users.models import Client, UserProxy
+from mygpo.users.models import Client, SyncGroup, UserProxy
 from mygpo.usersettings.models import UserSettings
 from mygpo.votes.models import Vote
 
@@ -71,11 +72,11 @@ class Command(BaseCommand):
         user = User.objects.get(username=username)
         if not user:
             raise CommandError("User %s does not exist" % username, returncode=-1)
-        
+
         if options.get('archive'):
             archive = options["archive"]
         else:
-            archive = "%s.tar.xstd" % output_dir
+            archive = os.path.join(settings.ARCHIVE_ROOT, "%s.tar.xstd" % username)
 
         if not os.path.exists(output_dir):
             os.makedirs(output_dir, exist_ok=True)
@@ -106,6 +107,17 @@ class Command(BaseCommand):
         self.create_archive()
         if not keep_output_dir:
             shutil.rmtree(self.output_dir)
+
+        if and_delete:
+            self.mark_archived()
+            self.remove_records()
+
+    def mark_archived(self):
+        self.user.is_active = False
+        self.user.profile.archived_date = datetime.now()
+        self.user.profile.archive_path = self.archive
+        self.user.profile.save()
+        self.user.save()
 
 
     def dump(self, data, filename):
@@ -331,11 +343,11 @@ class Command(BaseCommand):
                                "started": h.started,
                                "stopped": h.stopped,
                                "total": h.total,
-                       })                       
+                       })
                    last_podcast["episodes"].append(ep)
-                settings = UserSettings.objects.filter(user=self.user, object_id=s.podcast_id, content_type=podcast_type)
-                if settings:
-                    last_podcast["settings"] = settings[0].settings
+                user_settings = UserSettings.objects.filter(user=self.user, object_id=s.podcast_id, content_type=podcast_type)
+                if user_settings:
+                    last_podcast["settings"] = user_settings[0].settings
                 for c in CategoryEntry.objects.filter(podcast_id=s.podcast_id):
                     category = {
                         "id": c.id,
@@ -504,3 +516,25 @@ class Command(BaseCommand):
         for u in e.urls.all() or []:
             episode["urls"].append(u.url)
         return episode
+
+    @timed
+    def remove_records(self):
+        self.remove(Chapter, user=self.user.id)
+        self.remove(EpisodeHistoryEntry, user=self.user.id)
+        self.remove(HistoryEntry, user_id=self.user.id)
+        self.remove(EpisodeState, user=self.user.id)
+        self.remove(Subscription, user=self.user.id)
+        self.remove(Client, user=self.user.id)
+        self.remove(SyncGroup, user=self.user.id)
+        self.remove(UserSettings, user=self.user.id)
+        self.remove(FavoriteEpisode, user=self.user.id)
+        self.remove(PodcastList, user=self.user.id)
+        self.remove(Vote, user=self.user.id)
+        self.remove(PublishedPodcast, publisher=self.user.id)
+        self.remove(PodcastSuggestion, suggested_to=self.user)
+
+    @staticmethod
+    def remove(model, **filters):
+        before = perf_counter()
+        res = model.objects.filter(**filters).delete()
+        print("Deleted %04i %s in %.1fs" % (res[0], model.__name__, perf_counter() - before))

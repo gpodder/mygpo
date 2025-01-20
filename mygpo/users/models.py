@@ -156,6 +156,12 @@ class UserProfile(TwitterModel):
     # key for activating the user
     activation_key = models.CharField(max_length=40, null=True)
 
+    # archived date
+    archived_date = models.DateTimeField(null=True)
+
+    # archived date
+    archive_path = models.TextField(blank=True)
+
     def get_token(self, token_name):
         """returns a token"""
 
