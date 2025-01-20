@@ -1,8 +1,9 @@
+import os
 import string
 import random
 
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import FileResponse, HttpResponseRedirect, HttpResponseBadRequest, HttpResponseNotFound
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -86,15 +87,21 @@ class LoginView(View):
             return HttpResponseRedirect(login_page)
 
         if not user.is_active:
-            send_activation_email(user, request)
-            messages.error(
-                request,
-                _(
-                    "Please activate your account first. "
-                    "We have just re-sent your activation email"
-                ),
-            )
-            return HttpResponseRedirect(login_page)
+            if user.profile.archived_date is not None:
+                user_archived_page = "{page}?user={username}".format(
+                    page=reverse("user-archived"), username=username
+                )
+                return HttpResponseRedirect(user_archived_page)
+            else:
+                send_activation_email(user, request)
+                messages.error(
+                    request,
+                    _(
+                        "Please activate your account first. "
+                        "We have just re-sent your activation email"
+                    ),
+                )
+                return HttpResponseRedirect(login_page)
 
         # set up the user's session
         login(request, user)
@@ -236,3 +243,45 @@ class GoogleLoginCallback(TemplateView):
         headers = {"Authorization": "Bearer " + response["access_token"]}
         resp = requests.get(USERINFO_URL, headers=headers).json()
         return resp["data"]["email"]
+
+
+class ArchivedView(View):
+    """View to login a user"""
+
+    def get(self, request):
+        """Shows the info page"""
+
+        # Do not show this page for already-logged-in users
+        if request.user.is_authenticated:
+            # return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
+            raise Exception("coucou")
+
+        return render(
+            request,
+            "user_archived.html",
+            {"username": request.GET.get("user", "")},
+        )
+
+
+@never_cache
+def download_archive(request):
+    """ download a user's archive.
+
+    Requires the username and password to match the user's.
+    A check for correct folder is done to prevent arbitrary file exfiltration in case of database corruption.
+    It will only allow from within the ARCHIVE_ROOT (test will be adjusted later if necessary).
+    """
+    user = authenticate(username=request.POST.get("user"), password=request.POST.get("pwd"))
+
+    if not user:
+        return HttpResponseNotFound("Invalid user or password")
+
+    if not user.is_active and user.profile.archive_path is not None:
+        archive_path = os.path.abspath(os.path.normpath(user.profile.archive_path))
+        if os.path.dirname(archive_path) == settings.ARCHIVE_ROOT:
+            return FileResponse(open(archive_path, "rb"), as_attachment=True)
+        return HttpResponseBadRequest("Invalid archive path")
+
+    return HttpResponseBadRequest(
+        "Invalid user state"
+    )
