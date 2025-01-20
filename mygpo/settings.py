@@ -100,6 +100,11 @@ MEDIA_ROOT = os.getenv(
 MEDIA_URL = "/media/"
 
 
+ARCHIVE_ROOT = os.getenv(
+    "ARCHIVE_ROOT", os.path.abspath(os.path.join(BASE_DIR, "..", "archive"))
+)
+
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
