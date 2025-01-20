@@ -92,4 +92,6 @@ urlpatterns = [
         name="login-google-callback",
     ),
     path("logout/", LogoutView.as_view(next_page="home"), name="logout"),
+    path("archived/", user.ArchivedView.as_view(), name="user-archived"),
+    path("archived/download", user.download_archive, name="user-download-archive"),
 ]
