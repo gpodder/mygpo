@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 
 from mygpo.core.models import UpdateInfoModel
-from mygpo.podcasts.models import Episode, Podcast
+from mygpo.podcasts.models import Episode
 
 
 class Chapter(UpdateInfoModel):
