@@ -69,8 +69,8 @@ def episodes(request, username, version=1):
     if request.method == "POST":
         try:
             actions = parse_request_body(request)
-        except (UnicodeDecodeError, ValueError) as e:
-            msg = ("Could not decode episode update POST data for " + "user %s: %s") % (
+        except (UnicodeDecodeError, ValueError):
+            msg = ("Could not decode episode update POST data for user %s: %s") % (
                 username,
                 request.body.decode("ascii", errors="replace"),
             )
