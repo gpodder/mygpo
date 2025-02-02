@@ -1,8 +1,5 @@
-import hashlib
-
 from django import template
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext as _
 from django.utils.html import strip_tags, format_html
 from django.contrib.staticfiles.storage import staticfiles_storage
 

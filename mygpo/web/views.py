@@ -1,23 +1,15 @@
-import sys
 from collections import defaultdict
-from datetime import datetime, timedelta
 
-from django.urls import reverse
-from django.http import HttpResponseRedirect
-from django.contrib import messages
 from django.utils.translation import gettext as _
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.contrib.sites.requests import RequestSite
-from django.views import View
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
-from mygpo.podcasts.models import Podcast, Episode, Tag
-from mygpo.users.models import HistoryEntry, Client
+from mygpo.podcasts.models import Podcast, Tag
 from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.web.utils import process_lang_params
-from mygpo.utils import parse_range
 from mygpo.podcastlists.models import PodcastList
 from mygpo.favorites.models import FavoriteEpisode
 
@@ -86,16 +78,6 @@ def dashboard(request, episode_count=10):
 
     if PublishedPodcast.objects.filter(publisher=request.user).exists():
         checklist.append("publish")
-
-    tomorrow = datetime.today() + timedelta(days=1)
-
-    #    newest_episodes = Episode.objects.filter(podcast__in=subscribed_podcasts,
-    #                                             released__lt=tomorrow).\
-    #                                      select_related('podcast').\
-    #                                      prefetch_related('slugs',
-    #                                                       'podcast__slugs').\
-    #                                      order_by('-released')[:episode_count]
-    #
 
     newest_episodes = []
 

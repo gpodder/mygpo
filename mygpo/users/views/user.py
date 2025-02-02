@@ -1,13 +1,8 @@
-import string
-import random
-
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, get_user_model
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.sites.requests import RequestSite
-from django.conf import settings
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import never_cache
 from django.template.loader import render_to_string
@@ -20,9 +15,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 import requests
 from oauth2client.client import FlowExchangeError
 
-from mygpo.decorators import allowed_methods
 from mygpo.web.forms import RestorePasswordForm
-from mygpo.web.forms import ResendActivationForm
 from mygpo.constants import DEFAULT_LOGIN_REDIRECT
 from mygpo.web.auth import get_google_oauth_flow
 from mygpo.users.models import UserProxy

@@ -4,6 +4,7 @@ from mygpo.api import APIView, RequestException
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.exceptions import ParameterMissing
 from mygpo.chapters.models import Chapter
+from mygpo.podcasts.models import Episode, Podcast
 from mygpo.utils import parse_time, normalize_feed_url, get_timestamp
 
 

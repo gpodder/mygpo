@@ -6,7 +6,6 @@ from django.http import (
     HttpResponse,
     HttpResponseRedirect,
     HttpResponseForbidden,
-    Http404,
 )
 from django.core.cache import cache
 from django.views.decorators.cache import never_cache, cache_control

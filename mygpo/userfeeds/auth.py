@@ -1,6 +1,6 @@
 from functools import wraps
 
-from django.http import HttpResponse, HttpResponseBadRequest, Http404
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 

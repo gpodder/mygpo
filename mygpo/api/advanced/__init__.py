@@ -1,6 +1,3 @@
-from functools import partial
-
-from collections import defaultdict
 from datetime import datetime
 from importlib import import_module
 
@@ -9,7 +6,6 @@ import dateutil.parser
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
-    Http404,
     HttpResponseNotFound,
 )
 from django.core.exceptions import ValidationError
@@ -73,8 +69,8 @@ def episodes(request, username, version=1):
     if request.method == "POST":
         try:
             actions = parse_request_body(request)
-        except (UnicodeDecodeError, ValueError) as e:
-            msg = ("Could not decode episode update POST data for " + "user %s: %s") % (
+        except (UnicodeDecodeError, ValueError):
+            msg = ("Could not decode episode update POST data for user %s: %s") % (
                 username,
                 request.body.decode("ascii", errors="replace"),
             )
@@ -307,7 +303,7 @@ def device(request, username, device_uid, version=None):
 
     try:
         data = parse_request_body(request)
-    except (UnicodeDecodeError, ValueError) as e:
+    except (UnicodeDecodeError, ValueError):
         msg = ("Could not decode device update POST data for " + "user %s: %s") % (
             username,
             request.body.decode("ascii", errors="replace"),

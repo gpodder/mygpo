@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import json
-import functools
-import types
 import subprocess
-import os
-import operator
 import sys
 import re
-import collections
-import itertools
 from datetime import datetime, timedelta, date
 import time
 import hashlib
@@ -17,7 +11,6 @@ import urllib.parse
 import urllib.request, urllib.parse, urllib.error
 import urllib.request, urllib.error, urllib.parse
 import zlib
-import shlex
 
 from django.db import transaction, IntegrityError
 from django.conf import settings

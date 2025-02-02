@@ -2,7 +2,6 @@ from django import template
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.contrib.staticfiles.storage import staticfiles_storage
 
 
 register = template.Library()
