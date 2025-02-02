@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gpodder.net\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-18 18:57+0000\n"
+"POT-Creation-Date: 2022-07-04 12:52+0000\n"
 "PO-Revision-Date: 2012-10-13 12:53+0000\n"
 "Last-Translator: zeugma <unknown@example.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/mygpo/"
@@ -330,21 +330,21 @@ msgstr ""
 msgid "unsubscribed"
 msgstr ""
 
-#: mygpo/api/simple.py:57 mygpo/api/simple.py:92
+#: mygpo/api/simple.py:58 mygpo/api/simple.py:93
 #, python-format
 msgid "%(username)s's Subscription List"
 msgstr ""
 
-#: mygpo/api/simple.py:258
+#: mygpo/api/simple.py:259
 #, python-format
 msgid "gpodder.net - Top %(count)d"
 msgstr ""
 
-#: mygpo/api/simple.py:294
+#: mygpo/api/simple.py:295
 msgid "gpodder.net - Search"
 msgstr "gpodder.net - Arama"
 
-#: mygpo/api/simple.py:320
+#: mygpo/api/simple.py:321
 #, python-format
 msgid "gpodder.net - %(count)d Suggestions"
 msgstr ""
@@ -619,7 +619,7 @@ msgstr ""
 msgid "Client Access"
 msgstr ""
 
-#: mygpo/directory/views.py:334
+#: mygpo/directory/views.py:336
 #, fuzzy, python-format
 msgid "%d podcasts added"
 msgstr "Bir podcast ekle"
@@ -1270,7 +1270,7 @@ msgid ""
 "visible."
 msgstr ""
 
-#: mygpo/publisher/views.py:188 mygpo/users/views/settings.py:112
+#: mygpo/publisher/views.py:188 mygpo/users/views/settings.py:115
 msgid "Data updated"
 msgstr ""
 
@@ -1487,22 +1487,22 @@ msgstr ""
 msgid "Download OPML"
 msgstr ""
 
-#: mygpo/subscriptions/views.py:117
+#: mygpo/subscriptions/views.py:118
 #, python-format
 msgid "%(username)s's Podcast Subscriptions on %(site)s"
 msgstr ""
 
-#: mygpo/subscriptions/views.py:123
+#: mygpo/subscriptions/views.py:124
 #, python-format
 msgid "Recent changes to %(username)s's podcast subscriptions on %(site)s"
 msgstr ""
 
-#: mygpo/subscriptions/views.py:147
+#: mygpo/subscriptions/views.py:148
 #, python-format
 msgid "%(username)s subscribed to %(podcast)s (%(site)s)"
 msgstr ""
 
-#: mygpo/subscriptions/views.py:149
+#: mygpo/subscriptions/views.py:150
 #, python-format
 msgid "%(username)s unsubscribed from %(podcast)s (%(site)s)"
 msgstr ""
@@ -1520,27 +1520,27 @@ msgstr ""
 msgid "No Suggestions Yet"
 msgstr ""
 
-#: mygpo/users/models.py:224
+#: mygpo/users/models.py:226
 msgid "Desktop"
 msgstr ""
 
-#: mygpo/users/models.py:225
+#: mygpo/users/models.py:227
 msgid "Laptop"
 msgstr ""
 
-#: mygpo/users/models.py:226
+#: mygpo/users/models.py:228
 msgid "Cell phone"
 msgstr ""
 
-#: mygpo/users/models.py:227
+#: mygpo/users/models.py:229
 msgid "Server"
 msgstr "Sunucu"
 
-#: mygpo/users/models.py:228
+#: mygpo/users/models.py:230
 msgid "Tablet"
 msgstr ""
 
-#: mygpo/users/models.py:229
+#: mygpo/users/models.py:231
 msgid "Other"
 msgstr "Diğer"
 
@@ -1677,11 +1677,11 @@ msgstr ""
 msgid "Your account already has been activated. Go ahead and log in."
 msgstr ""
 
-#: mygpo/users/views/settings.py:67 mygpo/users/views/settings.py:104
+#: mygpo/users/views/settings.py:68 mygpo/users/views/settings.py:105
 msgid "Oops! Something went wrong. Please double-check the data you entered."
 msgstr ""
 
-#: mygpo/users/views/settings.py:124
+#: mygpo/users/views/settings.py:127
 msgid "Your account has been disconnected"
 msgstr ""
 

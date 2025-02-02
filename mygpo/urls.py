@@ -22,7 +22,7 @@ if settings.DEBUG:
     import debug_toolbar
 
     urlpatterns += [
-        path('__debug__/', include(debug_toolbar.urls)),
+        path("__debug__/", include(debug_toolbar.urls)),
     ]
 
 # URLs are still registered during maintenace mode because we need to

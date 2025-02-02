@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-18 18:57+0000\n"
+"POT-Creation-Date: 2022-07-04 12:52+0000\n"
 "PO-Revision-Date: 2018-10-28 18:17+0000\n"
 "Last-Translator: Enrico B. <enricobe@hotmail.com>, 2018\n"
 "Language-Team: Italian (https://www.transifex.com/gpoddernet/teams/93001/"
@@ -336,21 +336,21 @@ msgstr "sottoscritto"
 msgid "unsubscribed"
 msgstr "rimosso"
 
-#: mygpo/api/simple.py:57 mygpo/api/simple.py:92
+#: mygpo/api/simple.py:58 mygpo/api/simple.py:93
 #, python-format
 msgid "%(username)s's Subscription List"
 msgstr "Lista sottoscrizioni di %(username)s"
 
-#: mygpo/api/simple.py:258
+#: mygpo/api/simple.py:259
 #, python-format
 msgid "gpodder.net - Top %(count)d"
 msgstr "gpodder.net - Top %(count)d"
 
-#: mygpo/api/simple.py:294
+#: mygpo/api/simple.py:295
 msgid "gpodder.net - Search"
 msgstr "gpodder.net - Cerca"
 
-#: mygpo/api/simple.py:320
+#: mygpo/api/simple.py:321
 #, python-format
 msgid "gpodder.net - %(count)d Suggestions"
 msgstr "gpodder.net - %(count)d Suggerimenti"
@@ -626,7 +626,7 @@ msgstr "Classifica"
 msgid "Client Access"
 msgstr "Sottoscrizione client"
 
-#: mygpo/directory/views.py:334
+#: mygpo/directory/views.py:336
 #, python-format
 msgid "%d podcasts added"
 msgstr "%d podcast aggiunti"
@@ -1352,7 +1352,7 @@ msgstr ""
 "L'aggiornamento è stato schedulato. Potrebbe volerci del tempo prima che i "
 "risultati siano visibili."
 
-#: mygpo/publisher/views.py:188 mygpo/users/views/settings.py:112
+#: mygpo/publisher/views.py:188 mygpo/users/views/settings.py:115
 msgid "Data updated"
 msgstr "Dati aggiornati"
 
@@ -1584,22 +1584,22 @@ msgstr ""
 msgid "Download OPML"
 msgstr "Scarica OPML"
 
-#: mygpo/subscriptions/views.py:117
+#: mygpo/subscriptions/views.py:118
 #, python-format
 msgid "%(username)s's Podcast Subscriptions on %(site)s"
 msgstr "Sottoscrizioni podcast di %(username)s su %(site)s"
 
-#: mygpo/subscriptions/views.py:123
+#: mygpo/subscriptions/views.py:124
 #, python-format
 msgid "Recent changes to %(username)s's podcast subscriptions on %(site)s"
 msgstr "Modifiche recenti al podcast di %(username)s su %(site)s"
 
-#: mygpo/subscriptions/views.py:147
+#: mygpo/subscriptions/views.py:148
 #, python-format
 msgid "%(username)s subscribed to %(podcast)s (%(site)s)"
 msgstr "%(username)s abbonato a %(podcast)s (%(site)s)"
 
-#: mygpo/subscriptions/views.py:149
+#: mygpo/subscriptions/views.py:150
 #, python-format
 msgid "%(username)s unsubscribed from %(podcast)s (%(site)s)"
 msgstr "%(username)s disiscritto da %(podcast)s (%(site)s)"
@@ -1617,27 +1617,27 @@ msgstr "Nessun interesse"
 msgid "No Suggestions Yet"
 msgstr "Ancora nessun suggerimento"
 
-#: mygpo/users/models.py:224
+#: mygpo/users/models.py:226
 msgid "Desktop"
 msgstr "Desktop"
 
-#: mygpo/users/models.py:225
+#: mygpo/users/models.py:227
 msgid "Laptop"
 msgstr "Laptop"
 
-#: mygpo/users/models.py:226
+#: mygpo/users/models.py:228
 msgid "Cell phone"
 msgstr "Telefono"
 
-#: mygpo/users/models.py:227
+#: mygpo/users/models.py:229
 msgid "Server"
 msgstr "Server"
 
-#: mygpo/users/models.py:228
+#: mygpo/users/models.py:230
 msgid "Tablet"
 msgstr "Tablet"
 
-#: mygpo/users/models.py:229
+#: mygpo/users/models.py:231
 msgid "Other"
 msgstr "Altro"
 
@@ -1781,12 +1781,12 @@ msgstr "L'utente non esiste."
 msgid "Your account already has been activated. Go ahead and log in."
 msgstr "Il tuo account è già stato attivato. Procedi ed effettua il login."
 
-#: mygpo/users/views/settings.py:67 mygpo/users/views/settings.py:104
+#: mygpo/users/views/settings.py:68 mygpo/users/views/settings.py:105
 msgid "Oops! Something went wrong. Please double-check the data you entered."
 msgstr ""
 "Oops! Qualcosa è andato storto. Per favore ricontrolla i dati inseriti."
 
-#: mygpo/users/views/settings.py:124
+#: mygpo/users/views/settings.py:127
 msgid "Your account has been disconnected"
 msgstr "Il tuo account è stato disconesso."
 

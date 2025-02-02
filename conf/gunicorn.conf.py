@@ -1,4 +1,4 @@
-import multiprocessing
+# import multiprocessing
 import os
 
 bind = "unix:/tmp/mygpo.sock"
@@ -8,8 +8,9 @@ workers = 3
 # The maximum number of requests a worker will process before restarting.
 # max_requests = 1000
 
-errorlog = "/var/log/gunicorn/error.log"
-accesslog = "/var/log/gunicorn/access.log"
+log_dir = os.getenv("LOGGING_DIR_GUNICRON", "/var/log/gunicorn/")
+errorlog = log_dir + "error.log"
+accesslog = log_dir + "access.log"
 loglevel = "info"
 access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s %(T)s "%(f)s" "%(a)s"'
 
@@ -31,7 +32,7 @@ _USE_GEVENT = get_bool("USE_GEVENT", False)
 
 
 try:
-    # check f we *can* use gevent
+    # check if we *can* use gevent
     from psycogreen.gevent import patch_psycopg
 except ImportError:
     _USE_GEVENT = False

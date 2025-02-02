@@ -29,3 +29,6 @@ notebooks/
 
 .cache
 .pytest_cache
+
+# Visual Studio Code files
+.vscode

@@ -236,7 +236,7 @@ def longest_substr(strings):
     return substr
 
 
-def file_hash(f, h=hashlib.md5, block_size=2 ** 20):
+def file_hash(f, h=hashlib.md5, block_size=2**20):
     """returns the hash of the contents of a file"""
     f_hash = h()
     while True:

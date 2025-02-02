@@ -10,7 +10,7 @@ from django.views import View
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.urls import reverse
-from django.utils.http import is_safe_url
+from django.utils.http import url_has_allowed_host_and_scheme
 
 import requests
 from oauth2client.client import FlowExchangeError
@@ -96,7 +96,7 @@ class LoginView(View):
 
             domain = RequestSite(request).domain
             allowed_hosts = [domain]
-            if is_safe_url(next_page, allowed_hosts):
+            if url_has_allowed_host_and_scheme(next_page, allowed_hosts):
                 return HttpResponseRedirect(next_page)
 
             else:

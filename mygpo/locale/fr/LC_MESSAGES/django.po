@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-18 18:57+0000\n"
+"POT-Creation-Date: 2022-07-04 12:52+0000\n"
 "PO-Revision-Date: 2018-06-20 06:29+0000\n"
 "Last-Translator: Irriep Nala Novram <allannkorh@yahoo.fr>, 2019\n"
 "Language-Team: French (https://www.transifex.com/yaron/teams/87581/fr/)\n"
@@ -340,21 +340,21 @@ msgstr "abonné"
 msgid "unsubscribed"
 msgstr "désabonné"
 
-#: mygpo/api/simple.py:57 mygpo/api/simple.py:92
+#: mygpo/api/simple.py:58 mygpo/api/simple.py:93
 #, python-format
 msgid "%(username)s's Subscription List"
 msgstr "Liste d'abonnement de/d' %(username)s"
 
-#: mygpo/api/simple.py:258
+#: mygpo/api/simple.py:259
 #, python-format
 msgid "gpodder.net - Top %(count)d"
 msgstr "gpodder.net - Top %(count)d"
 
-#: mygpo/api/simple.py:294
+#: mygpo/api/simple.py:295
 msgid "gpodder.net - Search"
 msgstr "gpodder.net - Chercher"
 
-#: mygpo/api/simple.py:320
+#: mygpo/api/simple.py:321
 #, python-format
 msgid "gpodder.net - %(count)d Suggestions"
 msgstr "gpodder.net - %(count)d suggestions"
@@ -630,7 +630,7 @@ msgstr "Topliste"
 msgid "Client Access"
 msgstr "Accès client"
 
-#: mygpo/directory/views.py:334
+#: mygpo/directory/views.py:336
 #, python-format
 msgid "%d podcasts added"
 msgstr "%d podcasts ajoutés"
@@ -1365,7 +1365,7 @@ msgstr ""
 "La mise à jour a été planifiée. Cela peut prendre un certain temps avant que "
 "les résultats ne soient visibles."
 
-#: mygpo/publisher/views.py:188 mygpo/users/views/settings.py:112
+#: mygpo/publisher/views.py:188 mygpo/users/views/settings.py:115
 msgid "Data updated"
 msgstr "Données mises à jour"
 
@@ -1596,23 +1596,23 @@ msgstr ""
 msgid "Download OPML"
 msgstr "Télécharger OPML"
 
-#: mygpo/subscriptions/views.py:117
+#: mygpo/subscriptions/views.py:118
 #, python-format
 msgid "%(username)s's Podcast Subscriptions on %(site)s"
 msgstr "Abonnements podcast de %(username)s sur %(site)s"
 
-#: mygpo/subscriptions/views.py:123
+#: mygpo/subscriptions/views.py:124
 #, python-format
 msgid "Recent changes to %(username)s's podcast subscriptions on %(site)s"
 msgstr ""
 "Changements récents dans les abonnements podcast de %(username)s sur %(site)s"
 
-#: mygpo/subscriptions/views.py:147
+#: mygpo/subscriptions/views.py:148
 #, python-format
 msgid "%(username)s subscribed to %(podcast)s (%(site)s)"
 msgstr "%(username)s s'est abonné à %(podcast)s (%(site)s)"
 
-#: mygpo/subscriptions/views.py:149
+#: mygpo/subscriptions/views.py:150
 #, python-format
 msgid "%(username)s unsubscribed from %(podcast)s (%(site)s)"
 msgstr "%(username)s s'est désabonné de %(podcast)s (%(site)s)"
@@ -1630,27 +1630,27 @@ msgstr "Pas d'intérêt"
 msgid "No Suggestions Yet"
 msgstr "Aucune suggestion pour le moment"
 
-#: mygpo/users/models.py:224
+#: mygpo/users/models.py:226
 msgid "Desktop"
 msgstr "Bureau"
 
-#: mygpo/users/models.py:225
+#: mygpo/users/models.py:227
 msgid "Laptop"
 msgstr "Ordinateur portable"
 
-#: mygpo/users/models.py:226
+#: mygpo/users/models.py:228
 msgid "Cell phone"
 msgstr "Téléphone portable"
 
-#: mygpo/users/models.py:227
+#: mygpo/users/models.py:229
 msgid "Server"
 msgstr "Serveur"
 
-#: mygpo/users/models.py:228
+#: mygpo/users/models.py:230
 msgid "Tablet"
 msgstr "Tablette"
 
-#: mygpo/users/models.py:229
+#: mygpo/users/models.py:231
 msgid "Other"
 msgstr "Autre"
 
@@ -1800,13 +1800,13 @@ msgstr "L'utilisateur n'existe pas."
 msgid "Your account already has been activated. Go ahead and log in."
 msgstr "Votre compte a déjà été activé. Allez-y et connectez-vous."
 
-#: mygpo/users/views/settings.py:67 mygpo/users/views/settings.py:104
+#: mygpo/users/views/settings.py:68 mygpo/users/views/settings.py:105
 msgid "Oops! Something went wrong. Please double-check the data you entered."
 msgstr ""
 "Zut alors ! Quelque chose s'est mal passé. Veuillez vérifier les données que "
 "vous avez entrées."
 
-#: mygpo/users/views/settings.py:124
+#: mygpo/users/views/settings.py:127
 msgid "Your account has been disconnected"
 msgstr "Votre compte a été déconnecté"
 
@@ -2728,7 +2728,7 @@ msgstr "Épisode inconnu"
 
 #: mygpo/web/templatetags/menu.py:23 mygpo/web/templatetags/menu.py:75
 msgid "Home"
-msgstr "Acceuil"
+msgstr "Accueil"
 
 #: mygpo/web/templatetags/menu.py:30
 msgid "Help"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: my.gpodder.org\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-18 18:57+0000\n"
+"POT-Creation-Date: 2022-07-04 12:52+0000\n"
 "PO-Revision-Date: 2010-02-08 18:45-0300\n"
 "Last-Translator: Silvio Sisto <silvio.sisto@gmail.com>\n"
 "Language-Team: gpodder team <gpodder-devel@lists.berlios.de>\n"
@@ -329,21 +329,21 @@ msgstr ""
 msgid "unsubscribed"
 msgstr ""
 
-#: mygpo/api/simple.py:57 mygpo/api/simple.py:92
+#: mygpo/api/simple.py:58 mygpo/api/simple.py:93
 #, python-format
 msgid "%(username)s's Subscription List"
 msgstr ""
 
-#: mygpo/api/simple.py:258
+#: mygpo/api/simple.py:259
 #, python-format
 msgid "gpodder.net - Top %(count)d"
 msgstr ""
 
-#: mygpo/api/simple.py:294
+#: mygpo/api/simple.py:295
 msgid "gpodder.net - Search"
 msgstr ""
 
-#: mygpo/api/simple.py:320
+#: mygpo/api/simple.py:321
 #, python-format
 msgid "gpodder.net - %(count)d Suggestions"
 msgstr ""
@@ -628,7 +628,7 @@ msgstr "Mejores podcasts"
 msgid "Client Access"
 msgstr ""
 
-#: mygpo/directory/views.py:334
+#: mygpo/directory/views.py:336
 #, python-format
 msgid "%d podcasts added"
 msgstr ""
@@ -1284,7 +1284,7 @@ msgid ""
 "visible."
 msgstr ""
 
-#: mygpo/publisher/views.py:188 mygpo/users/views/settings.py:112
+#: mygpo/publisher/views.py:188 mygpo/users/views/settings.py:115
 #, fuzzy
 msgid "Data updated"
 msgstr "Dispositivos"
@@ -1505,22 +1505,22 @@ msgstr ""
 msgid "Download OPML"
 msgstr ""
 
-#: mygpo/subscriptions/views.py:117
+#: mygpo/subscriptions/views.py:118
 #, python-format
 msgid "%(username)s's Podcast Subscriptions on %(site)s"
 msgstr ""
 
-#: mygpo/subscriptions/views.py:123
+#: mygpo/subscriptions/views.py:124
 #, python-format
 msgid "Recent changes to %(username)s's podcast subscriptions on %(site)s"
 msgstr ""
 
-#: mygpo/subscriptions/views.py:147
+#: mygpo/subscriptions/views.py:148
 #, python-format
 msgid "%(username)s subscribed to %(podcast)s (%(site)s)"
 msgstr ""
 
-#: mygpo/subscriptions/views.py:149
+#: mygpo/subscriptions/views.py:150
 #, python-format
 msgid "%(username)s unsubscribed from %(podcast)s (%(site)s)"
 msgstr ""
@@ -1539,27 +1539,27 @@ msgstr ""
 msgid "No Suggestions Yet"
 msgstr "Sugerencias"
 
-#: mygpo/users/models.py:224
+#: mygpo/users/models.py:226
 msgid "Desktop"
 msgstr "Computadora de escritorio"
 
-#: mygpo/users/models.py:225
+#: mygpo/users/models.py:227
 msgid "Laptop"
 msgstr "Laptop"
 
-#: mygpo/users/models.py:226
+#: mygpo/users/models.py:228
 msgid "Cell phone"
 msgstr ""
 
-#: mygpo/users/models.py:227
+#: mygpo/users/models.py:229
 msgid "Server"
 msgstr "Servidor"
 
-#: mygpo/users/models.py:228
+#: mygpo/users/models.py:230
 msgid "Tablet"
 msgstr ""
 
-#: mygpo/users/models.py:229
+#: mygpo/users/models.py:231
 msgid "Other"
 msgstr "Otro"
 
@@ -1701,11 +1701,11 @@ msgstr ""
 msgid "Your account already has been activated. Go ahead and log in."
 msgstr ""
 
-#: mygpo/users/views/settings.py:67 mygpo/users/views/settings.py:104
+#: mygpo/users/views/settings.py:68 mygpo/users/views/settings.py:105
 msgid "Oops! Something went wrong. Please double-check the data you entered."
 msgstr ""
 
-#: mygpo/users/views/settings.py:124
+#: mygpo/users/views/settings.py:127
 #, fuzzy
 msgid "Your account has been disconnected"
 msgstr "El capítulo ha sido eliminado"

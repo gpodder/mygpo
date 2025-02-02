@@ -21,16 +21,16 @@ def get_device(user, uid, user_agent, undelete=True):
 
     # list of fields to update -- empty list = no update
     update_fields = []
+    new_client = False
 
-    try:
-        with transaction.atomic():
+    with transaction.atomic():
+        try:
+            client = Client.objects.get(user=user, uid=uid)
+        except Client.DoesNotExist:
             client = Client(id=uuid.uuid1(), user=user, uid=uid)
             client.clean_fields()
             client.clean()
-            client.save()
-
-    except IntegrityError:
-        client = Client.objects.get(user=user, uid=uid)
+            new_client = True
 
     if client.deleted and undelete:
         client.deleted = False
@@ -40,7 +40,9 @@ def get_device(user, uid, user_agent, undelete=True):
         client.user_agent = user_agent
         update_fields.append("user_agent")
 
-    if update_fields:
+    if new_client:
+        client.save()
+    elif update_fields:
         client.save(update_fields=update_fields)
 
     return client

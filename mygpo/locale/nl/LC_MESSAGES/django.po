@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-18 18:57+0000\n"
+"POT-Creation-Date: 2022-07-04 12:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Heimen Stoffels <vistausss@outlook.com>, 2018\n"
 "Language-Team: Dutch (Netherlands) (https://www.transifex.com/yaron/"
@@ -338,21 +338,21 @@ msgstr "geabonneerd"
 msgid "unsubscribed"
 msgstr "gedeabonneerd"
 
-#: mygpo/api/simple.py:57 mygpo/api/simple.py:92
+#: mygpo/api/simple.py:58 mygpo/api/simple.py:93
 #, python-format
 msgid "%(username)s's Subscription List"
 msgstr "%(username)s's abonnementenlijst"
 
-#: mygpo/api/simple.py:258
+#: mygpo/api/simple.py:259
 #, python-format
 msgid "gpodder.net - Top %(count)d"
 msgstr "gpodder.net - Top %(count)d"
 
-#: mygpo/api/simple.py:294
+#: mygpo/api/simple.py:295
 msgid "gpodder.net - Search"
 msgstr "gpodder.net - Zoeken"
 
-#: mygpo/api/simple.py:320
+#: mygpo/api/simple.py:321
 #, python-format
 msgid "gpodder.net - %(count)d Suggestions"
 msgstr "gpodder.net - %(count)d suggesties"
@@ -628,7 +628,7 @@ msgstr "Toplijst"
 msgid "Client Access"
 msgstr "Client-toegang"
 
-#: mygpo/directory/views.py:334
+#: mygpo/directory/views.py:336
 #, python-format
 msgid "%d podcasts added"
 msgstr "%d podcasts toegevoegd"
@@ -1356,7 +1356,7 @@ msgstr ""
 "De bijwerking is ingepland. Het kan even duren voordat de resultaten "
 "zichtbaar zijn."
 
-#: mygpo/publisher/views.py:188 mygpo/users/views/settings.py:112
+#: mygpo/publisher/views.py:188 mygpo/users/views/settings.py:115
 msgid "Data updated"
 msgstr "Gegevens bijgewerkt"
 
@@ -1587,23 +1587,23 @@ msgstr ""
 msgid "Download OPML"
 msgstr "OPML downloaden"
 
-#: mygpo/subscriptions/views.py:117
+#: mygpo/subscriptions/views.py:118
 #, python-format
 msgid "%(username)s's Podcast Subscriptions on %(site)s"
 msgstr "%(username)s's podcastabonnementen op %(site)s"
 
-#: mygpo/subscriptions/views.py:123
+#: mygpo/subscriptions/views.py:124
 #, python-format
 msgid "Recent changes to %(username)s's podcast subscriptions on %(site)s"
 msgstr ""
 "Recente wijzigen aan %(username)s's podcastabonnementenlijst op %(site)s"
 
-#: mygpo/subscriptions/views.py:147
+#: mygpo/subscriptions/views.py:148
 #, python-format
 msgid "%(username)s subscribed to %(podcast)s (%(site)s)"
 msgstr "%(username)s heeft zich geabonneerd op %(podcast)s (%(site)s)"
 
-#: mygpo/subscriptions/views.py:149
+#: mygpo/subscriptions/views.py:150
 #, python-format
 msgid "%(username)s unsubscribed from %(podcast)s (%(site)s)"
 msgstr "%(username)s heeft zich gedeabonneerd op %(podcast)s (%(site)s)"
@@ -1621,27 +1621,27 @@ msgstr "Niet geïnteresseerd"
 msgid "No Suggestions Yet"
 msgstr "Nog geen aanbevelingen"
 
-#: mygpo/users/models.py:224
+#: mygpo/users/models.py:226
 msgid "Desktop"
 msgstr "Desktop"
 
-#: mygpo/users/models.py:225
+#: mygpo/users/models.py:227
 msgid "Laptop"
 msgstr "Laptop"
 
-#: mygpo/users/models.py:226
+#: mygpo/users/models.py:228
 msgid "Cell phone"
 msgstr "Mobiele telefoon"
 
-#: mygpo/users/models.py:227
+#: mygpo/users/models.py:229
 msgid "Server"
 msgstr "Server"
 
-#: mygpo/users/models.py:228
+#: mygpo/users/models.py:230
 msgid "Tablet"
 msgstr "Tablet"
 
-#: mygpo/users/models.py:229
+#: mygpo/users/models.py:231
 msgid "Other"
 msgstr "Overig"
 
@@ -1786,11 +1786,11 @@ msgstr "Account bestaat niet."
 msgid "Your account already has been activated. Go ahead and log in."
 msgstr "Je account is al geactiveerd. Ga door met inloggen."
 
-#: mygpo/users/views/settings.py:67 mygpo/users/views/settings.py:104
+#: mygpo/users/views/settings.py:68 mygpo/users/views/settings.py:105
 msgid "Oops! Something went wrong. Please double-check the data you entered."
 msgstr "Oeps! Er is iets misgegaan. Controleer de ingevoerde gegevens."
 
-#: mygpo/users/views/settings.py:124
+#: mygpo/users/views/settings.py:127
 msgid "Your account has been disconnected"
 msgstr "Je account is niet langer gekoppeld"
 
