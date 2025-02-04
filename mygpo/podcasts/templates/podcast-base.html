@@ -17,7 +17,6 @@
 
 {% block head %}
  {{ podcast|opengraph_podcast }}
- {% google_plus_one_head %}
 {% endblock %}
 
 {% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}

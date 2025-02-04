@@ -17,7 +17,6 @@ from oauth2client.client import FlowExchangeError
 
 from mygpo.web.forms import RestorePasswordForm
 from mygpo.constants import DEFAULT_LOGIN_REDIRECT
-from mygpo.web.auth import get_google_oauth_flow
 from mygpo.users.models import UserProxy
 from mygpo.users.views.registration import send_activation_email
 from mygpo.utils import random_token
@@ -148,84 +147,3 @@ def restore_password(request):
     )
     user.email_user(subject, message)
     return render(request, "password_reset.html")
-
-
-class GoogleLogin(View):
-    """Redirects to Google Authentication page"""
-
-    def get(self, request):
-        flow = get_google_oauth_flow(request)
-        auth_uri = flow.step1_get_authorize_url()
-        return HttpResponseRedirect(auth_uri)
-
-
-class GoogleLoginCallback(TemplateView):
-    """Logs user in, or connects user to account"""
-
-    def get(self, request):
-
-        if request.GET.get("error"):
-            messages.error(request, _("Login failed."))
-            return HttpResponseRedirect(reverse("login"))
-
-        code = request.GET.get("code")
-        if not code:
-            messages.error(request, _("Login failed."))
-            return HttpResponseRedirect(reverse("login"))
-
-        flow = get_google_oauth_flow(request)
-
-        try:
-            credentials = flow.step2_exchange(code)
-        except FlowExchangeError:
-            messages.error(request, _("Login with Google is currently not possible."))
-            logger.exception("Login with Google failed")
-            return HttpResponseRedirect(reverse("login"))
-
-        email = self._get_email(credentials.token_response)
-
-        # Connect account
-        if request.user.is_authenticated:
-            request.user.google_email = email
-            request.user.save()
-            messages.success(
-                request,
-                _(
-                    "Your account has been connected with "
-                    "{google}. Open Settings to change this.".format(google=email)
-                ),
-            )
-            return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
-
-        # Check if Google account is connected
-        User = get_user_model()
-        try:
-            user = User.objects.get(profile__google_email=email)
-
-        except User.DoesNotExist:
-            # Connect account
-            messages.error(
-                request,
-                _(
-                    "No account connected with your Google "
-                    "account %s. Please log in to connect." % email
-                ),
-            )
-            return HttpResponseRedirect(
-                "{login}?next={connect}".format(
-                    login=reverse("login"), connect=reverse("login-google")
-                )
-            )
-
-        # Log in user
-        # TODO: this should probably be replaced with a call to authenticate()
-        # http://stackoverflow.com/questions/6034763/django-attributeerror-user-object-has-no-attribute-backend-but-it-does
-        user.backend = "django.contrib.auth.backends.ModelBackend"
-        login(request, user)
-        return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
-
-    def _get_email(self, response):
-        USERINFO_URL = "https://www.googleapis.com/userinfo/email?alt=json"
-        headers = {"Authorization": "Bearer " + response["access_token"]}
-        resp = requests.get(USERINFO_URL, headers=headers).json()
-        return resp["data"]["email"]
