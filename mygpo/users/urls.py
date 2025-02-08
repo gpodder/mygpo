@@ -84,11 +84,5 @@ urlpatterns = [
     ),
     path("register/restore_password", user.restore_password, name="restore-password"),
     path("login/", user.LoginView.as_view(), name="login"),
-    path("login/google", user.GoogleLogin.as_view(), name="login-google"),
-    path(
-        "login/oauth2callback",
-        user.GoogleLoginCallback.as_view(),
-        name="login-google-callback",
-    ),
     path("logout/", LogoutView.as_view(next_page="home"), name="logout"),
 ]

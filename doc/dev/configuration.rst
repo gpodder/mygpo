@@ -12,7 +12,6 @@ General
 * ``ADMINS`` - corresponds to `Django's ADMINS setting <https://docs.djangoproject.com/en/dev/ref/settings/#admins>`_. Specified as ``Name <email@host.com>``. Multiple entries can be separated by whitespace.
 * ``DEBUG`` - Debug flag, see `Django's DEBUG setting <https://docs.djangoproject.com/en/1.11/ref/settings/#std:setting-DEBUG>`_
 * ``DEFAULT_BASE_URL`` - base URL for creating URLs, eg ``https://gpodder.net``
-* ``GOOGLE_ANALYTICS_PROPERTY_ID`` - Google Analytics Property ID
 * ``MAINTENANCE`` - Maintenance flag
 * ``SECRET_KEY`` - see `Django's SECRET_KEY setting <https://docs.djangoproject.com/en/1.11/ref/settings/#secret-key>`_
 * ``STAFF_TOKEN`` - token which can be appended to URLs to access staff-only pages
@@ -22,8 +21,6 @@ General
 Advertising
 -----------
 
-* ``ADSENSE_CLIENT`` - Google AdSense Client ID
-* ``ADSENSE_SLOT_BOTTOM``- Ad for the ad slot on the bottom of the page
 * ``PODCAST_AD_ID`` - Database Id of the podcast which is currently advertising
 
 
@@ -90,14 +87,6 @@ Logging
 * ``OPBEAT_APP_ID`` - Opbeat App ID
 * ``OPBEAT_ORGANIZATION_ID`` - Opbeat Organization ID
 * ``OPBEAT_SECRET_TOKEN`` - Opbeat Secret Token
-
-
-
-Social Login
-------------
-
-* ``GOOGLE_CLIENT_ID`` - Google Client ID
-* ``GOOGLE_CLIENT_SECRET`` - Google Client Secret
 
 
 API

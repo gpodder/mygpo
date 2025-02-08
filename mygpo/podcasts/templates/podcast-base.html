@@ -2,7 +2,6 @@
 {% load i18n %}
 {% load podcasts %}
 {% load facebook %}
-{% load google %}
 {% load utils %}
 
 {% load menu %}
@@ -17,7 +16,6 @@
 
 {% block head %}
  {{ podcast|opengraph_podcast }}
- {% google_plus_one_head %}
 {% endblock %}
 
 {% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
@@ -90,10 +88,6 @@
 
 {% endblock %}
 
-
-{% block ads %}
- {% comment %}disable ads on podcast pages{% endcomment %}
-{% endblock %}
 
 {% block javascript %}
     {{ block.super }}
