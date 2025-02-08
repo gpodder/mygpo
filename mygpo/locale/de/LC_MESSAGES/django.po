@@ -2074,7 +2074,7 @@ msgid "Link&nbsp;To&nbsp;Us"
 msgstr ""
 
 #: mygpo/web/templates/base.html:188 mygpo/web/templates/home.html:207
-msgid "hosting provided by prgmr.com"
+msgid "hosting provided by tornadovps.com"
 msgstr ""
 
 #: mygpo/web/templates/contribute.html:8 mygpo/web/templatetags/menu.py:27

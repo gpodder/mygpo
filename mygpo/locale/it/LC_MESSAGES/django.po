@@ -2024,8 +2024,8 @@ msgid "Link&nbsp;To&nbsp;Us"
 msgstr "Collegati&nbsp;A&nbsp;Noi"
 
 #: mygpo/web/templates/base.html:188 mygpo/web/templates/home.html:207
-msgid "hosting provided by prgmr.com"
-msgstr "hosting fornito da prgmr.com"
+msgid "hosting provided by tornadovps.com"
+msgstr "hosting fornito da tornadovps.com"
 
 #: mygpo/web/templates/contribute.html:8 mygpo/web/templatetags/menu.py:27
 msgid "Contribute"
