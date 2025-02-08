@@ -104,26 +104,6 @@
 
                     <footer>
 
-                 {% block ads %}
-                  {% if adsense_client %}
-                   <hr />
-
-                   <div class="row">
-                    <div class="col-lg-offset-2 col-md-8">
-                    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-                     <!-- Bottom -->
-                     <ins class="adsbygoogle"
-                          style="display:inline-block;width:728px;height:90px"
-                          data-ad-client="{{ adsense_client }}"
-                          data-ad-slot="{{ adsense_slot_bottom }}"></ins>
-                    <script>
-                     (adsbygoogle = window.adsbygoogle || []).push({});
-                    </script>
-                   </div>
-
-                  {% endif %}
-                 {% endblock %}
-
                   <div class="row">
                         <hr />
 

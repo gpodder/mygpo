@@ -42,11 +42,6 @@
 
         {% block head %}{% endblock %}
 
-        {% if google_analytics_property_id %}
-        {% load googleanalytics %}
-        {{ google_analytics_property_id|google_analytics_async }}
-        {% endif %}
-
     </head>
 
     <body>

@@ -2,7 +2,6 @@
 {% load i18n %}
 {% load podcasts %}
 {% load facebook %}
-{% load google %}
 {% load utils %}
 
 {% load menu %}
@@ -89,10 +88,6 @@
 
 {% endblock %}
 
-
-{% block ads %}
- {% comment %}disable ads on podcast pages{% endcomment %}
-{% endblock %}
 
 {% block javascript %}
     {{ block.super }}

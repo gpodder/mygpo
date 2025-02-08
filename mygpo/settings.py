@@ -114,8 +114,6 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                "mygpo.web.google.analytics",
-                "mygpo.web.google.adsense",
                 # make the debug variable available in templates
                 # https://docs.djangoproject.com/en/dev/ref/templates/api/#django-core-context-processors-debug
                 "django.template.context_processors.debug",
@@ -239,8 +237,6 @@ SECRET_KEY = os.getenv("SECRET_KEY", "")
 if "pytest" in sys.argv[0]:
     SECRET_KEY = "test"
 
-GOOGLE_ANALYTICS_PROPERTY_ID = os.getenv("GOOGLE_ANALYTICS_PROPERTY_ID", "")
-
 DIRECTORY_EXCLUDED_TAGS = os.getenv("DIRECTORY_EXCLUDED_TAGS", "").split()
 
 FLICKR_API_KEY = os.getenv("FLICKR_API_KEY", "")
@@ -319,10 +315,6 @@ API_ACTIONS_MAX_NONBG = get_intOrNone("API_ACTIONS_MAX_NONBG", 100)
 API_ACTIONS_BG_HANDLER = "mygpo.api.tasks.episode_actions_celery_handler"
 
 
-ADSENSE_CLIENT = os.getenv("ADSENSE_CLIENT", "")
-
-ADSENSE_SLOT_BOTTOM = os.getenv("ADSENSE_SLOT_BOTTOM", "")
-
 # we're running behind a proxy that sets the X-Forwarded-Proto header correctly
 # see https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -350,11 +342,6 @@ CELERY_RESULT_EXPIRES = 60 * 60  # 1h expiry time in seconds
 
 CELERY_ACCEPT_CONTENT = ["json"]
 
-
-### Google API
-
-GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
-GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
 
 # URL where users of the site can get support
 SUPPORT_URL = os.getenv("SUPPORT_URL", "")
