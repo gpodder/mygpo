@@ -55,35 +55,39 @@ class Command(BaseCommand):
     """
     Create an archive of all user content.
 
-    The user is specified by its username.
+    The user is specified by its user id.
     """
 
     def add_arguments(self, parser):
-        parser.add_argument("username", type=str)
+        parser.add_argument("username_or_id", type=str)
         parser.add_argument("output_dir", type=str)
         parser.add_argument("--archive", type=str)
+        parser.add_argument("--is-username", type=bool, default=False)
         parser.add_argument("--keep-output-dir", type=bool, default=False)
         parser.add_argument("--and-delete", type=bool, default=False)
 
     @timed
-    def handle(self, *args, username, output_dir, keep_output_dir, and_delete, **options):
+    def handle(self, *args, username_or_id, is_username, output_dir, keep_output_dir, and_delete, **options):
 
         User = get_user_model()
-        user = User.objects.get(username=username)
+        if is_username:
+            user = User.objects.get(username=username_or_id)
+        else:
+            user = User.objects.get(id=int(username_or_id))
         if not user:
             raise CommandError("User %s does not exist" % username, returncode=-1)
 
         if options.get('archive'):
             archive = options["archive"]
         else:
-            archive = os.path.join(settings.ARCHIVE_ROOT, "%s.tar.xstd" % username)
+            archive = os.path.join(settings.ARCHIVE_ROOT, "%s-%i.tar.xstd" % (user.username, user.id))
 
         if not os.path.exists(output_dir):
             os.makedirs(output_dir, exist_ok=True)
         elif not os.path.exists(os.path.join(output_dir, "meta.json")):
             raise CommandError("output_dir exists and doesn't contain meta.json", returncode=1)
 
-        print("archiving user %s (id=%i)" % (username, user.id))
+        print("archiving user %s (id=%i)" % (user.username, user.id))
         self.user = user
         self.output_dir = output_dir
         self.archive = archive
