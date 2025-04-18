@@ -92,8 +92,6 @@
         {% csrf_token %}
         <button class="btn btn-default" type="submit">{% trans "Disconnect" %}</button>
        </form>
-      {% else %}
-       <a class="btn btn-default" href="{% url "login-google" %}">{% trans "Connect" %}</a>
       {% endif %}
      </td>
     </tr>
