@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/user_archived/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/user_archived/"|section_menu }}{% endblock %}
+
+{% block title %}{% trans "Archived User" %}{% endblock %}
+
+{% block header %}
+   <h1>{% trans "Archived User" %}</h1>
+
+  {% if next %}
+    <div class="alert alert-warning">
+     {% trans "Due to over a year inactivity your account has been archived." %}
+    </div>
+  {% endif %}
+
+{% endblock %}
+
+
+{% block content %}
+
+	<p>Dear <b>{{ username }}</b>, due to resource restrictions on gpodder.net it is no
+	longer (as of October 2024) feasible to keep all data.</p>
+
+	<p>We have decided to first archive inactive user (no login for 6 months) data.
+	This reduces required capacity by a factor of 3.</p>
+
+	<p>We understand this is an inconvenience for you but this is required to keep
+	running this free service.</p>
+
+	<p>We prepared an archive of your user data and all derived data at the time,
+	to the best of our abilities. It contains all your subscriptions, history,
+	as well as related podcast and episode information.</p>
+
+	<p>For instance you'll find all your subscriptions in OPML format in the <code>subscriptions.opml</code> file
+	of the archive. This format is used to import podcast subscriptions in a podcatcher, like gPodder desktop
+	or AntennaPod.</p>
+
+	<p>Additional data is in json format in various files of the archive.</p>
+
+	<p>The archive doesn't include podcast or episode cover art, as it would make it too
+	large to manage.</p>
+
+	<p>To get access to your archive, please enter your password and click on <i>Download</i></p>
+
+   <form role="form" class="col-lg-offset-3 col-lg-6" action="{% url "user-download-archive" %}" method="post">
+
+     {% csrf_token %}
+
+     <input type="hidden" name="user" value="{{ username }}" />
+
+     <div class="form-group">
+      <label class="control-label">Password</label>
+      <input class="form-control" type="password" name="pwd" />
+     </div>
+
+     <div class="form-group">
+       <button class="btn btn-primary" type="submit">{% trans "Download" %}</button>
+     </div>
+
+   </form>
+{% endblock %}

@@ -14,6 +14,7 @@ HIDDEN_URIS = (
     "/user/subscriptions/",
     "/publisher/podcast/",
     "/share/me",
+    "/user_archived/",
 )
 
 MENU_STRUCTURE = (
@@ -23,6 +24,7 @@ MENU_STRUCTURE = (
             ("/", _("Home")),
             ("/login/", _("Login")),
             ("/register/", _("Register")),
+            ("/user_archived/", _("Archived")),
             ("", _("Docs")),
             ("/contribute/", _("Contribute")),
             ("/developer/", _("Development")),

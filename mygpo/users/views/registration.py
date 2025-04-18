@@ -142,7 +142,7 @@ class ActivationView(TemplateView):
     def get(self, request, activation_key):
         try:
             user = UserProxy.objects.get(
-                profile__activation_key=activation_key, is_active=False
+                profile__activation_key=activation_key, is_active=False, profile__archived_date__isnull=True
             )
         except UserProxy.DoesNotExist:
             messages.error(
@@ -183,7 +183,7 @@ class ResendActivationView(FormView):
     success_url = reverse_lazy("resent-activation")
 
     def form_valid(self, form):
-        """called whene the form was POSTed and its contents were valid"""
+        """called when the form was POSTed and its contents were valid"""
 
         try:
             user = UserProxy.objects.all().by_username_or_email(
@@ -193,6 +193,13 @@ class ResendActivationView(FormView):
         except UserProxy.DoesNotExist:
             messages.error(self.request, _("User does not exist."))
             return HttpResponseRedirect(reverse("resend-activation"))
+
+        if user.profile.archived_date is not None:
+            messages.error(self.request, _("Your data has been archived."))
+            user_archived_page = "{page}?user={username}".format(
+                page=reverse("user-archived"), username=user.username
+            )
+            return HttpResponseRedirect(user_archived_page)
 
         if user.profile.activation_key is None:
             messages.success(
