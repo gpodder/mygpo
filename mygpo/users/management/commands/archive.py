@@ -94,7 +94,7 @@ class Command(BaseCommand):
 
         data = {
             "date": datetime.now(),
-            "version": "2024-12-23",
+            "version": "2025-04-18",
         }
         self.dump(data, "meta.json")
         self.export_opml()
@@ -285,9 +285,9 @@ class Command(BaseCommand):
                     "description": p.description,
                     "link": p.link,
                     "language": p.language,
-                    # "last_update": p,
-                    # "created": p.created,
-                    # "modified": p.modified,
+                    "last_update": p.last_update,
+                    "created": p.created,
+                    "modified": p.modified,
                     "license": p.license,
                     "flattr_url": p.flattr_url,
                     # TODO: content_types seems broken in the DB ("v,i,d,e,o" and the like )
@@ -295,7 +295,6 @@ class Command(BaseCommand):
                     # outdated not exported
                     "author": p.author,
                     "logo_url": p.logo_url,
-                    "group_id": p.group_id,
                     # common_episode_title can be recomputed
                     "new_location": p.new_location,
                     # latest_episode_timestamp would be outdated by now
@@ -316,8 +315,21 @@ class Command(BaseCommand):
                     "categories": [],
                 }
                 if p.group_id:
-                    last_podcast["group_title"] = p.group.title
+                    last_podcast["group"] = {
+                        "id": p.group_id,
+                        "title": p.group.title,
+                    }
                     last_podcast["group_member_name"] = p.group_member_name
+                    if p.group.podcast_set.count() > 1:
+                        last_podcast["group"]["other_members"] = [
+                            {
+                                "id": gp.id,
+                                "member_name": gp.group_member_name,
+                                "url": gp.url,
+                                "title": gp.title
+                            }
+                            for gp in p.group.podcast_set.all() if gp.id != p.id
+                        ]
                 for u in p.urls.all() or []:
                     last_podcast["urls"].append(u.url)
                 for slug in p.slugs.all() or []:
@@ -364,7 +376,8 @@ class Command(BaseCommand):
                         "tags": [t.tag for t in c.category.tags.all()],
                     }
                     last_podcast["categories"].append(category)
-                # FIXME: PodcastGroup, merged_uuids
+                # XXX: related podcasts is a derived data with too big cardinality to include: top 10 have thousands
+                # merged_uuids don't have a value in export
             client = {
                 "client_id": s.client_id,
                 "ref_url": s.ref_url,
@@ -495,8 +508,8 @@ class Command(BaseCommand):
             "description": e.description,
             "link": e.link,
             "language": e.language,
-            #"created": e.created,
-            #"modified": e.modified,
+            "created": e.created,
+            "modified": e.modified,
             "license": e.license,
             "flattr_url": e.flattr_url,
             "content_types": e.content_types,
