@@ -75,7 +75,10 @@ class Command(BaseCommand):
         else:
             user = User.objects.get(id=int(username_or_id))
         if not user:
-            raise CommandError("User %s does not exist" % username, returncode=-1)
+            raise CommandError("User %s does not exist" % username_or_id, returncode=-1)
+
+        if not user.is_active and user.profile.archived_date is not None:
+            raise CommandError("User %s already archived on %s" % (username_or_id, user.profile.archived_date), returncode=1)
 
         if options.get('archive'):
             archive = options["archive"]
