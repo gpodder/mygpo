@@ -111,11 +111,11 @@ class Command(BaseCommand):
         self.export_favorite_episodes()
         self.export_suggestions()
 
-        self.create_archive()
+        archive_ok = self.create_archive()
         if not keep_output_dir:
             shutil.rmtree(self.output_dir)
 
-        if and_delete:
+        if archive_ok and and_delete:
             self.mark_archived()
             self.remove_records()
 
