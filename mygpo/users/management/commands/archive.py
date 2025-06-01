@@ -143,7 +143,7 @@ class Command(BaseCommand):
         try:
             subprocess.check_output(cmd, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
-            print("E: Unable to create %s with %r: %r", self.archive, cmd, e)
+            print("E: Unable to create %s with %r: %r" % (self.archive, cmd, e))
             return 1
 
     @timed
