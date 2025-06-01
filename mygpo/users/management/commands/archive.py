@@ -85,6 +85,9 @@ class Command(BaseCommand):
         else:
             archive = os.path.join(settings.ARCHIVE_ROOT, "%s-%i.tar.xstd" % (user.username, user.id))
 
+        if not os.path.exists(os.path.dirname(archive)):
+            raise CommandError("archive %s parent directory doesnt exist" % archive, returncode=1)
+
         if not os.path.exists(output_dir):
             os.makedirs(output_dir, exist_ok=True)
         elif not os.path.exists(os.path.join(output_dir, "meta.json")):
