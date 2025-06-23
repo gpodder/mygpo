@@ -38,6 +38,8 @@ ADMINS = re.findall(r"\s*([^<]+) <([^>]+)>\s*", os.getenv("ADMINS", ""))
 
 MANAGERS = ADMINS
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 DATABASES = {
     "default": dj_database_url.config(default="postgres://mygpo:mygpo@localhost/mygpo")
 }
