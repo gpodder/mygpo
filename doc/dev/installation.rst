@@ -35,7 +35,7 @@ Or:
 .. code-block:: bash
 
     sudo apt-get install libpq-dev libjpeg-dev zlib1g-dev libwebp-dev \
-		build-essential python3-dev virtualenv libffi-dev redis postgresql
+		build-essential python3-dev virtualenv libffi-dev redis postgresql python3-pip
 
 
 Now install additional dependencies locally:
