@@ -116,45 +116,24 @@
                         </ul>
 <hr>
 <div class="well">
-<h3>2025-02-08 <b>Annoucement</b></h3>
+<h3>2025-06-23 <b>Announcement</b></h3>
 
 <p>Dear gpodder.net users,</p>
-<p>we now have a total of 146k accounts, which is an amazing number.
-Thank you for joining us on this platform! But of these 146k accounts,
-only 2500 logged-in last month, 7000 logged-in in the past 12 months: not that many active users after all!</p>
 
-<p><b>This message is to inform you that we will likely purge inactive (no login since 2024-01-01) user data from our database</b></p>
+<p>over the past months we have migrated gpodder.net to newer hardware, still sponsored by
+<a href="https://tornadovps.com">tornadovps.com</a>.</p>
+<p>With the move from hdd to ssd we have gained performance on database queries.</p>
 
-<p>To my knowledge this is the first purge since 2009.
-We have to do it in order to restore good performance for active users.
-Indeed the system has struggled with an ever-increasing database for <a href="https://github.com/gpodder/mygpo/issues/349">years</a> now.
-More than 300GB database on spinning disks is too much. We also keep album artwork for long-gone podcasts, up to 70GB. This has to go.
-</p>
-
-<p>Based on first simulations, we would <i>reclaim more than 80%</i> of the database,
-going down to 50GB. This would encourage our hoster to migrate us to newer hardware,
-with even more performance gains. By the way, a huge thank you to our hoster: <a href="https://tornadovps.com">tornadovps.com</a>,
-who provided us with 2 VMs with significant resources free of charge for years. We really appreciate their support.</p>
-
-<p><b>So, what will happen to long-inactive user data?</b> We will produce a downloadable export of everything they have sent to gpodder.net:</p>
-<ol>
-<li>the list of their current subscriptions, in OPML format, to be able to easily re-import them in their podcatcher of choice;</li>
-<li>a json export of their profile, all subscribed podcasts, all episodes, every history entry ((un)subscribe, download, play, delete, ...), tags, favorite episodes, etc..</li>
-</ol>
-
-<p>This archive will be available for download from their user profile. It will be kept for as long as it's reasonable,
-at least for another year. Any other action on gpodder.net will be unavailable.
-There is currently no way to re-activate an archived account but we could think
-of something if necessary (open an issue).</p>
-
-<p>The export code is available for review on <a href="https://github.com/gpodder/mygpo/pull/829">github</a>.
-Please give feedback if you find missing data. It's our intent to give back any bit of data we can find on our system.</p>
-
-<p>We also would like to engage with you on the future of gpodder.net: please bring your feedback
-on <a href="https://github.com/gpodder/mygpo/issues/830">this issue</a>. In particular, should it be a more stripped-down
-syncing engine or is the web experience crucial?</p>
+<p>This was made possible by drastically reducing the DB size by archiving inactive user
+data. Individual archives are available for download from their user profile. It will be kept for as long as it's reasonable,
+at least until 2026-06-30. There is currently no way to re-activate an archived account.</p>
 
 <p>Thank you for reading this, and for your continued use of the podcasting ecosystem!</p>
+
+<p>For the record, work on archival started in Autumn 2024, it was announced and open for comments in February and March,
+and DB migration was done by June 2025. Web app is migrated, but still the old VM is the frontend and ssl termination for a week.
+</p>
+
 </div>
                         {% endblock %}
                     </div>
