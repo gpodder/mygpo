@@ -39,10 +39,10 @@ install-deps:
 		gettext
 
 format-code:
-	black --target-version py38 --skip-string-normalization mygpo/
+	black --target-version py312 --skip-string-normalization mygpo/
 
 check-code-format:
-	black --check --target-version py38 --skip-string-normalization mygpo/
+	black --check --target-version py312 --skip-string-normalization mygpo/
 
 
 .PHONY: all help test clean unittest coverage install-deps format-code
