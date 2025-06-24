@@ -1,5 +1,4 @@
-""" This module contains models for the publisher pages """
-
+"""This module contains models for the publisher pages"""
 
 from django.db import models
 from django.conf import settings

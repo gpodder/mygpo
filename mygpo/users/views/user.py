@@ -2,7 +2,12 @@ import logging
 import os
 
 from django.shortcuts import render
-from django.http import FileResponse, HttpResponseRedirect, HttpResponseBadRequest, HttpResponseNotFound
+from django.http import (
+    FileResponse,
+    HttpResponseRedirect,
+    HttpResponseBadRequest,
+    HttpResponseNotFound,
+)
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib import messages
 from django.contrib.sites.requests import RequestSite
@@ -176,13 +181,15 @@ class ArchivedView(View):
 
 @never_cache
 def download_archive(request):
-    """ download a user's archive.
+    """download a user's archive.
 
     Requires the username and password to match the user's.
     A check for correct folder is done to prevent arbitrary file exfiltration in case of database corruption.
     It will only allow from within the ARCHIVE_ROOT (test will be adjusted later if necessary).
     """
-    user = authenticate(username=request.POST.get("user"), password=request.POST.get("pwd"))
+    user = authenticate(
+        username=request.POST.get("user"), password=request.POST.get("pwd")
+    )
 
     if not user:
         return HttpResponseNotFound("Invalid user or password")
@@ -193,6 +200,4 @@ def download_archive(request):
             return FileResponse(open(archive_path, "rb"), as_attachment=True)
         return HttpResponseBadRequest("Invalid archive path")
 
-    return HttpResponseBadRequest(
-        "Invalid user state"
-    )
+    return HttpResponseBadRequest("Invalid user state")

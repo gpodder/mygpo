@@ -142,7 +142,9 @@ class ActivationView(TemplateView):
     def get(self, request, activation_key):
         try:
             user = UserProxy.objects.get(
-                profile__activation_key=activation_key, is_active=False, profile__archived_date__isnull=True
+                profile__activation_key=activation_key,
+                is_active=False,
+                profile__archived_date__isnull=True,
             )
         except UserProxy.DoesNotExist:
             messages.error(

@@ -1,4 +1,4 @@
-""" Converts models to a JSON representation """
+"""Converts models to a JSON representation"""
 
 
 def podcast_to_json(podcast):

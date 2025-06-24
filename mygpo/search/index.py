@@ -1,4 +1,4 @@
-""" Contains code for searching podcasts
+"""Contains code for searching podcasts
 
 Uses django.contrib.postgres.search for searching. See docs at
 https://docs.djangoproject.com/en/1.11/ref/contrib/postgres/search/

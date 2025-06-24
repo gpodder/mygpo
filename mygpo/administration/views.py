@@ -363,9 +363,15 @@ class ResendActivationEmail(AdminView):
             return HttpResponseRedirect(reverse("admin-resend-activation"))
 
         if user.is_active:
-            messages.success(request, _("User {username} is already activated").format(username=username))
+            messages.success(
+                request,
+                _("User {username} is already activated").format(username=username),
+            )
         elif user.profile.archived_date is not None:
-            messages.error(self.request, _("User {username} data has been archived.").format(username=username))
+            messages.error(
+                self.request,
+                _("User {username} data has been archived.").format(username=username),
+            )
         else:
             send_activation_email(user, request)
             messages.success(

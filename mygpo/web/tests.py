@@ -219,9 +219,12 @@ class PodcastLogoTests(TestCase):
         logo.LOGO_STORAGE = _logo_storage
 
     def test_new_logo(self):
-        with responses.RequestsMock() as rsps, open(IMG_PATH1, "rb") as body1, open(
-            IMG_PATH1, "rb"
-        ) as body2, open(IMG_PATH2, "rb") as body3:
+        with (
+            responses.RequestsMock() as rsps,
+            open(IMG_PATH1, "rb") as body1,
+            open(IMG_PATH1, "rb") as body2,
+            open(IMG_PATH2, "rb") as body3,
+        ):
             rsps.add(
                 responses.GET,
                 self.URL,
