@@ -861,6 +861,9 @@ class Episode(
 
         return int(match.group(1))
 
+    def __str__(self):
+        return self.title or f"NOTITLE<{self.url if self.url else self.pk}>"
+
 
 class Tag(models.Model):
     """Tags any kind of Model
