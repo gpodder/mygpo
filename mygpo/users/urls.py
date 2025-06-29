@@ -85,4 +85,6 @@ urlpatterns = [
     path("register/restore_password", user.restore_password, name="restore-password"),
     path("login/", user.LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(next_page="home"), name="logout"),
+    path("archived/", user.ArchivedView.as_view(), name="user-archived"),
+    path("archived/download", user.download_archive, name="user-download-archive"),
 ]

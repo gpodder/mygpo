@@ -49,7 +49,11 @@ def remove_inactive_users():
     remove_before = datetime.utcnow() - timedelta(days=valid_days)
     logger.warning("Removing unactivated users before %s", remove_before)
 
-    users = User.objects.filter(is_active=False, date_joined__lt=remove_before)
+    users = User.objects.filter(
+        is_active=False,
+        date_joined__lt=remove_before,
+        profile__archived_date__isnull=True,
+    )
 
     for user in users:
         clients = models.Client.objects.filter(user=user)

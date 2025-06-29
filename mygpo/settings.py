@@ -38,6 +38,8 @@ ADMINS = re.findall(r"\s*([^<]+) <([^>]+)>\s*", os.getenv("ADMINS", ""))
 
 MANAGERS = ADMINS
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 DATABASES = {
     "default": dj_database_url.config(default="postgres://mygpo:mygpo@localhost/mygpo")
 }
@@ -98,6 +100,11 @@ MEDIA_ROOT = os.getenv(
 )
 
 MEDIA_URL = "/media/"
+
+
+ARCHIVE_ROOT = os.getenv(
+    "ARCHIVE_ROOT", os.path.abspath(os.path.join(BASE_DIR, "..", "archive"))
+)
 
 
 TEMPLATES = [

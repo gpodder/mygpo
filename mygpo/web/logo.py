@@ -69,7 +69,7 @@ class CoverArt(View):
             raise Http404("Cannot open cover file") from ioe
 
         try:
-            im.thumbnail((size, size), Image.ANTIALIAS)
+            im.thumbnail((size, size), Image.LANCZOS)
             resized = im
         except (struct.error, IOError, IndexError) as ex:
             # raised when trying to read an interlaced PNG;

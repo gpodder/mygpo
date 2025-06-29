@@ -54,7 +54,7 @@ def update_search_index(run_every=UPDATE_INTERVAL):
 def _get_search_vectors():
     """Return the combined search vector to use for indexing podcasts"""
     vectors = []
-    for (field, weight) in INDEX_FIELDS.items():
+    for field, weight in INDEX_FIELDS.items():
         # index the podcast based on the stored language
         vectors.append(SearchVector(field, weight=weight))
 

@@ -1,5 +1,4 @@
-""" This module contains abstract models that are used in multiple apps """
-
+"""This module contains abstract models that are used in multiple apps"""
 
 from django.db import models, connection
 
