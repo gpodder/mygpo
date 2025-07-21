@@ -13,17 +13,21 @@ class PodcastGrouper(object):
 
     DEFAULT_RELEASE = datetime(1970, 1, 1)
 
-    def __init__(self, podcasts):
+    def __init__(self, podcasts, as_episodes=False):
+        """as_episodes to request episode model objects from group, else episode id"""
 
         if not podcasts or (None in podcasts):
             raise ValueError("podcasts must not be None")
 
         self.podcasts = podcasts
+        self.as_episodes = as_episodes
 
     def __get_episodes(self):
-        episodes = {}
-        for podcast in self.podcasts:
-            episodes.update(dict((e.id, e.id) for e in podcast.episode_set.all()))
+        episodes = {
+            e.id: (e if self.as_episodes else e.id)
+            for podcast in self.podcasts
+            for e in podcast.episode_set.all()
+        }
 
         return episodes
 

@@ -20,6 +20,11 @@
 {% endblock %}
 
 {% block content %}
+{% if podcasts|length == 1 %}
+ <div class="alert alert-info">
+  {% trans "No need to merge: a single Podcast is returned" %}
+ </div>
+{% else %}
  <div class="alert alert-info">
   {% trans "Episodes that have the same number will be merged. Please verify all your changes by clicking on 'Renew Groups' before starting the Merge." %}
  </div>
@@ -46,8 +51,8 @@
      {% for podcast in podcasts %}
      <td>
       {% for episode in episodes %}
-       {% if episode.podcast == podcast.get_id %}
-        <input type="text" name="episode_{% get_id episode %}" value="{{ n }}" size="2"/>
+       {% if episode.podcast == podcast %}
+       <input type="text" name="episode_{{ episode.id }}" value="{{ n }}" size="2"/>
         {% episode_link episode podcast %}<br />
        {% endif %}
       {% endfor %}
@@ -65,7 +70,7 @@
 
   </table>
  </form>
-
+{% endif %}
 
 {% endblock %}
 

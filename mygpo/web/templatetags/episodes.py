@@ -154,7 +154,7 @@ def episode_link(episode, podcast, title=None):
         or getattr(episode, "display_title", None)
         or episode.get_short_title(podcast.common_episode_title)
         or episode.title
-        or _("Unknown Episode")
+        or (_("Unknown Episode") + (" %s" % episode.url))
     )
 
     title = strip_tags(title)
