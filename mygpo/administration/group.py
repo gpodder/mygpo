@@ -14,7 +14,7 @@ class PodcastGrouper(object):
     DEFAULT_RELEASE = datetime(1970, 1, 1)
 
     def __init__(self, podcasts, as_episodes=False):
-        """ as_episodes to request episode model objects from group, else episode id """
+        """as_episodes to request episode model objects from group, else episode id"""
 
         if not podcasts or (None in podcasts):
             raise ValueError("podcasts must not be None")

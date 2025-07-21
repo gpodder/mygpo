@@ -70,7 +70,12 @@ class PodcastMerger(object):
 
             episode_id = episodes.pop(0)
             episode = Episode.objects.get(pk=episode_id)
-            logger.info("Merging %d episodes with id=%s url=%s", len(episodes) + 1, episode.id, episode.url)
+            logger.info(
+                "Merging %d episodes with id=%s url=%s",
+                len(episodes) + 1,
+                episode.id,
+                episode.url,
+            )
 
             eps = [Episode.objects.get(pk=eid) for eid in episodes]
             merge_model_objects(episode, eps)
@@ -319,4 +324,6 @@ def merge(moved_obj, new_target):
         pass
 
     else:
-        raise TypeError("unknown type for merging: {objtype}".format(objtype=type(moved_obj)))
+        raise TypeError(
+            "unknown type for merging: {objtype}".format(objtype=type(moved_obj))
+        )

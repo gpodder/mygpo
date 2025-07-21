@@ -129,7 +129,7 @@ class MergeBase(AdminView):
             # AFAIK duplicate podcasts with same url are an anomaly in the DB, but I got 54 of them on 2025-07-19
             for p in Podcast.objects.filter(urls__url=podcast_url):
                 if p not in podcasts:
-                  podcasts.append(p)
+                    podcasts.append(p)
         # Prefer to merge into the podcast with the most episodes.
         # This is tuned to removing duplicate podcasts where I had a "good" podcast
         # with many metadata and another one with only a few episodes.
@@ -155,7 +155,7 @@ class MergeVerify(MergeBase):
                 e = Episode.objects.get(pk=id_id[0])
                 # was grouping by url + title, but it caused duplicate urls when
                 # merging duplicate podcasts.
-                return ((e.url, ), id_id[0])
+                return ((e.url,), id_id[0])
 
             num_groups = grouper.group(get_features)
 
