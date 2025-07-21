@@ -34,6 +34,8 @@ def get_intOrNone(name, default):
 
 DEBUG = get_bool("DEBUG", False)
 
+DUMP_TRAFFIC = get_bool("DUMP_TRAFFIC", False)
+
 ADMINS = re.findall(r"\s*([^<]+) <([^>]+)>\s*", os.getenv("ADMINS", ""))
 
 MANAGERS = ADMINS
@@ -210,6 +212,8 @@ try:
 except ImportError:
     pass
 
+if DUMP_TRAFFIC:
+    MIDDLEWARE += ["mygpo.dumping.DumpingMiddleware"]
 
 ACCOUNT_ACTIVATION_DAYS = int(os.getenv("ACCOUNT_ACTIVATION_DAYS", 7))
 
