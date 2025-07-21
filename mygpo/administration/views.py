@@ -125,9 +125,15 @@ class MergeBase(AdminView):
             if not podcast_url:
                 continue
 
-            p = Podcast.objects.get(urls__url=podcast_url)
-            podcasts.append(p)
-
+            # Allow for multiple podcasts with same url (duplicates), so we can merge them using this method.
+            # AFAIK duplicate podcasts with same url are an anomaly in the DB, but I got 54 of them on 2025-07-19
+            for p in Podcast.objects.filter(urls__url=podcast_url):
+                if p not in podcasts:
+                  podcasts.append(p)
+        # Prefer to merge into the podcast with the most episodes.
+        # This is tuned to removing duplicate podcasts where I had a "good" podcast
+        # with many metadata and another one with only a few episodes.
+        podcasts.sort(key=(lambda p: p.episode_set.count()), reverse=True)
         return podcasts
 
 
@@ -140,11 +146,16 @@ class MergeVerify(MergeBase):
         try:
             podcasts = self._get_podcasts(request)
 
-            grouper = PodcastGrouper(podcasts)
+            if len(podcasts) == 1:
+                return self.render_to_response({"podcasts": podcasts, "groups": {}})
+
+            grouper = PodcastGrouper(podcasts, as_episodes=True)
 
             def get_features(id_id):
                 e = Episode.objects.get(pk=id_id[0])
-                return ((e.url, e.title), id_id[0])
+                # was grouping by url + title, but it caused duplicate urls when
+                # merging duplicate podcasts.
+                return ((e.url, ), id_id[0])
 
             num_groups = grouper.group(get_features)
 
@@ -159,7 +170,7 @@ class MergeVerify(MergeBase):
 
 class MergeProcess(MergeBase):
 
-    RE_EPISODE = re.compile(r"episode_([0-9a-fA-F]{32})")
+    RE_EPISODE = re.compile(r"episode_([0-9a-fA-F-]+)")
 
     def post(self, request):
 
@@ -169,7 +180,7 @@ class MergeProcess(MergeBase):
         except InvalidPodcast as ip:
             messages.error(request, _("No podcast with URL {url}").format(url=str(ip)))
 
-        grouper = PodcastGrouper(podcasts)
+        grouper = PodcastGrouper(podcasts, as_episodes=("renew" in request.POST))
 
         features = {}
         for key, feature in request.POST.items():
@@ -177,8 +188,7 @@ class MergeProcess(MergeBase):
             if m:
                 episode_id = m.group(1)
                 features[episode_id] = feature
-
-        get_features = lambda id_e: (features.get(id_e[0], id_e[0]), id_e[0])
+        get_features = lambda id_e: (features.get(str(id_e[0]), id_e[0]), id_e[0])
 
         num_groups = grouper.group(get_features)
 

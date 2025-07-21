@@ -4,22 +4,26 @@ from django.db.models import Model
 from django.apps import apps
 from django.contrib.contenttypes.fields import GenericForeignKey
 
+from mygpo.data.models import PodcastUpdateResult
+from mygpo.episodestates.models import EpisodeState
 from mygpo.podcasts.models import (
     MergedUUID,
     URL,
     MergedUUID,
     Podcast,
     Episode,
+    Slug,
 )
 from mygpo.history.models import HistoryEntry, EpisodeHistoryEntry
 from mygpo.subscriptions.models import Subscription
+from mygpo.usersettings.models import UserSettings
 
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-PG_UNIQUE_VIOLATION = 23505
+PG_UNIQUE_VIOLATION = '23505'
 
 
 class IncorrectMergeException(Exception):
@@ -66,7 +70,7 @@ class PodcastMerger(object):
 
             episode_id = episodes.pop(0)
             episode = Episode.objects.get(pk=episode_id)
-            logger.info("Merging %d episodes", len(episodes))
+            logger.info("Merging %d episodes with id=%s url=%s", len(episodes) + 1, episode.id, episode.url)
 
             eps = [Episode.objects.get(pk=eid) for eid in episodes]
             merge_model_objects(episode, eps)
@@ -207,7 +211,7 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
                     with transaction.atomic():
                         generic_related_object.save()
                 except IntegrityError as ie:
-                    if ie.__cause__.pgcode == PG_UNIQUE_VIOLATION:
+                    if str(ie.__cause__.pgcode) == PG_UNIQUE_VIOLATION:
                         merge(generic_related_object, primary_object)
 
         # Try to fill all missing values in primary object by
@@ -267,6 +271,18 @@ def reassigned(obj, new):
     elif isinstance(obj, HistoryEntry):
         pass
 
+    elif isinstance(obj, PodcastUpdateResult):
+        pass
+
+    elif isinstance(obj, Slug):
+        pass
+
+    elif isinstance(obj, UserSettings):
+        pass
+
+    elif isinstance(obj, EpisodeState):
+        pass
+
     else:
         raise TypeError(
             "unknown type for reassigning: {objtype}".format(objtype=type(obj))
@@ -303,4 +319,4 @@ def merge(moved_obj, new_target):
         pass
 
     else:
-        raise TypeError("unknown type for merging: {objtype}".format(objtype=type(old)))
+        raise TypeError("unknown type for merging: {objtype}".format(objtype=type(moved_obj)))
