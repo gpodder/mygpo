@@ -15,6 +15,6 @@ psycopg2cffi==2.9.0
 python-dateutil==2.8.2
 redis==5.2.1
 django-celery-beat==2.3.0
-django-celery-results==2.4.0
+django-celery-results==2.6.0
 requests==2.32.4
 django-db-geventpool==4.0.1
