@@ -57,10 +57,18 @@ def remove_inactive_users():
 
     for user in users:
         clients = models.Client.objects.filter(user=user)
-        logger.warning('Deleting %d clients of user "%s"', len(clients), user.username)
-        clients.delete()
-        logger.warning('Deleting user "%s"', user.username)
-        user.delete()
+        if user.profile.archive_path:
+          logger.warning('Would delete %d clients of ARCHIVED user "%s" at "%s"', len(clients), user.username, user.profile.archive_path)
+        elif clients:
+          logger.warning('Would delete %d clients of user "%s" joined %s last_login %s', len(clients), user.username, user.date_joined, user.last_login)
+        else:
+          logger.info('Would delete user "%s" joined %s last_login %s without client', user.username, user.date_joined, user.last_login)
+
+
+#        logger.warning('Deleting %d clients of user "%s"', len(clients), user.username)
+#        clients.delete()
+#        logger.warning('Deleting user "%s"', user.username)
+#        user.delete()
 
 
 @shared_task(run_every=timedelta(hours=1))
