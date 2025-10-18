@@ -63,7 +63,7 @@ class SubscriptionsAPI(APIView):
 
         conflicts = intersect(add, remove)
         if conflicts:
-            msg = "can not add and remove '{}' at the same time".format(str(conflicts))
+            msg = "{} {} can not add and remove '{}' at the same time".format(user.pk, device.uid, str(conflicts))
             logger.warning(msg)
             raise RequestException(msg)
 

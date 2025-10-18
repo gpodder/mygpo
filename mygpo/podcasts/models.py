@@ -47,7 +47,7 @@ class TitleModel(models.Model):
     subtitle = models.TextField(null=False, blank=True)
 
     def __str__(self):
-        return self.title
+        return self.title or f"NOTITLE<{self.pk}>"
 
     class Meta:
         abstract = True
