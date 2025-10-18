@@ -169,14 +169,14 @@ class ArchivedView(View):
         """Shows the info page"""
 
         # Do not show this page for already-logged-in users
+        username = request.GET.get("user", "")
         if request.user.is_authenticated:
-            # return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
-            raise Exception("coucou")
+            username = request.user.username
 
         return render(
             request,
             "user_archived.html",
-            {"username": request.GET.get("user", "")},
+            {"username": username},
         )
 
 
