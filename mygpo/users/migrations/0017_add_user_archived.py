@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0016_alter_userprofile_twitter'),
+        ("users", "0016_alter_userprofile_twitter"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='userprofile',
-            name='archive_path',
+            model_name="userprofile",
+            name="archive_path",
             field=models.TextField(blank=True),
         ),
         migrations.AddField(
-            model_name='userprofile',
-            name='archived_date',
+            model_name="userprofile",
+            name="archived_date",
             field=models.DateTimeField(null=True),
         ),
     ]

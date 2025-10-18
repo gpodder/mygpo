@@ -58,11 +58,27 @@ def remove_inactive_users():
     for user in users:
         clients = models.Client.objects.filter(user=user)
         if user.profile.archive_path:
-          logger.warning('Would delete %d clients of ARCHIVED user "%s" at "%s"', len(clients), user.username, user.profile.archive_path)
+            logger.warning(
+                'Would delete %d clients of ARCHIVED user "%s" at "%s"',
+                len(clients),
+                user.username,
+                user.profile.archive_path,
+            )
         elif clients:
-          logger.warning('Would delete %d clients of user "%s" joined %s last_login %s', len(clients), user.username, user.date_joined, user.last_login)
+            logger.warning(
+                'Would delete %d clients of user "%s" joined %s last_login %s',
+                len(clients),
+                user.username,
+                user.date_joined,
+                user.last_login,
+            )
         else:
-          logger.info('Would delete user "%s" joined %s last_login %s without client', user.username, user.date_joined, user.last_login)
+            logger.info(
+                'Would delete user "%s" joined %s last_login %s without client',
+                user.username,
+                user.date_joined,
+                user.last_login,
+            )
 
 
 #        logger.warning('Deleting %d clients of user "%s"', len(clients), user.username)
