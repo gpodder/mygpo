@@ -23,6 +23,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 import requests
 from oauth2client.client import FlowExchangeError
 
+from mygpo.settings import ARCHIVE_ROOT
 from mygpo.web.forms import RestorePasswordForm
 from mygpo.constants import DEFAULT_LOGIN_REDIRECT
 from mygpo.users.models import UserProxy
@@ -196,7 +197,7 @@ def download_archive(request):
 
     if not user.is_active and user.profile.archive_path is not None:
         archive_path = os.path.abspath(os.path.normpath(user.profile.archive_path))
-        if os.path.dirname(archive_path) == settings.ARCHIVE_ROOT:
+        if os.path.dirname(archive_path) == ARCHIVE_ROOT:
             return FileResponse(open(archive_path, "rb"), as_attachment=True)
         return HttpResponseBadRequest("Invalid archive path")
 
