@@ -18,7 +18,8 @@ def merge_podcasts(podcast_ids, num_groups):
 
     logger.info("merging podcast ids %s", podcast_ids)
 
-    podcasts = list(Podcast.objects.filter(id__in=podcast_ids))
+    # order is important to merge the one with less episodes into the other
+    podcasts = [Podcast.objects.get(id=pid) for pid in podcast_ids]
 
     logger.info("merging podcasts %s", podcasts)
 
