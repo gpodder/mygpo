@@ -1,3 +1,4 @@
+import logging
 import re
 
 from django import forms
@@ -16,6 +17,9 @@ from django.contrib.sites.requests import RequestSite
 
 from mygpo.utils import random_token
 from mygpo.users.models import UserProxy
+
+
+logger = logging.getLogger(__name__)
 
 
 USERNAME_MAXLEN = get_user_model()._meta.get_field("username").max_length
@@ -144,12 +148,20 @@ class ActivationView(TemplateView):
             user = UserProxy.objects.get(
                 profile__activation_key=activation_key,
                 is_active=False,
-                profile__archived_date__isnull=True,
             )
         except UserProxy.DoesNotExist:
             messages.error(
                 request,
-                _("The activation link is either not " "valid or has already expired."),
+                _("The activation link is either not valid or has already expired."),
+            )
+            return super(ActivationView, self).get(request, activation_key)
+        if user.profile.archived_date:
+            logger.warning("Strange attempt to activate from archived user %s", user.id)
+            messages.error(
+                request,
+                _(
+                    "Your account has been archived. It can't be re-activated automatically. Please see https://github.com/gpodder/mygpo/issues/866"
+                ),
             )
             return super(ActivationView, self).get(request, activation_key)
 
