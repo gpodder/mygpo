@@ -170,7 +170,7 @@ class EpisodeHistoryEntry(models.Model):
         if exists:
             logger.debug(
                 "Trying to save duplicate {cls} for {user} "
-                "/ {episode}".format(cls=cls, user=user, episode=episode)
+                "/ {episode}".format(cls=cls, user=user, episode=episode.get_id())
             )
             # if such an entry already exists, do nothing
             return

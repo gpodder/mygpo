@@ -23,7 +23,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-PG_UNIQUE_VIOLATION = '23505'
+PG_UNIQUE_VIOLATION = "23505"
 
 
 class IncorrectMergeException(Exception):

@@ -97,7 +97,7 @@ class Command(BaseCommand):
                 returncode=1,
             )
 
-        if options.get('archive'):
+        if options.get("archive"):
             archive = options["archive"]
         else:
             archive = os.path.join(
@@ -230,7 +230,7 @@ class Command(BaseCommand):
         last_episode = None
         last_episode_id = None
         for c in Chapter.objects.filter(user=self.user.id).order_by(
-            'episode_id', 'start'
+            "episode_id", "start"
         ):
             if last_episode_id and last_episode_id != c.episode_id:
                 data.append(last_episode)
@@ -460,7 +460,7 @@ class Command(BaseCommand):
     @timed
     def export_opml(self):
         podcasts = get_subscribed_podcasts(self.user)
-        exporter = Exporter('')
+        exporter = Exporter("")
         opml = exporter.generate(podcasts)
         with open(os.path.join(self.output_dir, "subscriptions.opml"), "wb") as f:
             f.write(opml)
