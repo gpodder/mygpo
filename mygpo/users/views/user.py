@@ -139,7 +139,14 @@ def restore_password(request):
         messages.error(request, _("User does not exist."))
         return render(request, "password_reset_failed.html")
 
-    if not user.is_active:
+    # Archived users don't have an activation key. Indeed we don't want them to
+    # reactivate unintentionally.
+    if not user.is_active and not user.profile.archived_date:
+        # reset activation key, or we send links to /activate/None !
+        if not user.profile.activation_key:
+            logger.warning("user %s had an empty activation key", user.id)
+            user.profile.activation_key = random_token()
+            user.profile.save()
         send_activation_email(user, request)
         messages.error(
             request,
