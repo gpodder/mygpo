@@ -5,7 +5,7 @@ The episode actions API is used to synchronize episode-related events between
 individual devices. Clients can send and store events on the webservice which
 makes it available to other clients. The following types of actions are
 currently accepted by the API: download, play, delete, new. Additional types
-can be requested on the Mailing List.
+can be requested on Github.
 
 Example use cases
 
