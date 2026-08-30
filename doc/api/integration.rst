@@ -10,7 +10,7 @@ applications. It describes good practice and points out caveats.
 General
 -------
 
-* The `Mailing List <https://gpodder.github.io/docs/mailing-list.html>`_ is the right
+* The `Issue Tracker <https://github.com/gpodder/mygpo/issues>`_ is the right
   place to ask questions
 
 * Consult the :ref:`api-reference` for available functionality.
@@ -34,7 +34,7 @@ Implementation
 
 * Try to keep the requests to the API to a sensible limit. There are no hard
   limit, please judge for yourself what is necessary in your case. Please ask
-  on the mailing list if unsure. Your client might get blocked if it
+  on the issue tracker if unsure. Your client might get blocked if it
   misbehaves.
 
 * Your client should send a useful User-Agent header. We might block clients
