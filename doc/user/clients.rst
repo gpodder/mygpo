@@ -72,6 +72,7 @@ Name                       Status       gpodder.net features                    
 `Clementine`_              Active       Directory, Search, Subscription sync                      GPL
 `Kasts`_                   Active       Subscription and Episode Action sync                      GPL-2.0-or-later
 `Mopidy-Podcast-GPodder`_  Development  Directory, Search                                         Apache 2.0
+`Rhythmbox`_               Active       Subscription and Episode Action sync                      GPL
 =========================  ===========  ========================================================  ================  ===============
 
 
@@ -167,3 +168,4 @@ Nokia Podcasting       -       Subscription service    GPL         `Podcasting D
 .. _Poddi: http://www.allaboutsymbian.com/reviews/item/15840_Poddi_Podcatcher.php
 .. _Poddi in the Nokia Store: http://store.ovi.com/content/317235
 .. _Kasts: https://apps.kde.org/en/kasts/
+.. _Rhythmbox: https://gnome.pages.gitlab.gnome.org/rhythmbox/
