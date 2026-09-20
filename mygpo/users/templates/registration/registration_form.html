@@ -68,6 +68,18 @@
     </div>
 
     <div class="control-group">
+     <label class="control-label">Free service</label>
+     <div class="controls">
+      <p>
+      {{ form.ack_limited }}<span> {% trans "I understand gpodder.net is a free community service and that functionality might be reduced or stopped at any time" %}</span>
+      <p>
+      {% for err in form.ack_limited.errors %}
+       <span class="help-block alert alert-error">{{ err }}</span>
+      {% endfor %}
+     </div>
+    </div>
+
+    <div class="control-group">
      <div class="controls">
       <button class="btn btn-primary" type="submit">{% trans "Register" %}</button>
      </div>
@@ -75,7 +87,38 @@
 
    </fieldset>
   </form>
-
+  
+  <div class="help-block alert alert-warning">
+  <p>
+  <b>2026-09-06 note</b>&mdash; We can't keep operating gpodder.net as a free global service with the functionalities it has had in the past.
+  This is due to storage and processing requirements for more than 100k users.
+  </p>
+  <ol>
+  <li>podcast indexing broke in 2023. We kept the ability to browse subscriptions and episodes in the website,
+  but it has very limited value for newer data.</li>
+  <li>Inactive users have been archived, and the associated data has been purged from the database at the start of 2025.
+  This has let us shrink the database and get faster storage from our sponsor as a consequence.</li>
+  <li>The scope has been reduced to serving as a synchronization mechanism between devices since then.
+  The typical use-case we would like to serve is sync between gPodder on the desktop and AntennaPod on an Android device.</li>
+  <li>Fresh data consists now mostly of URLs and technical data (not title, description, etc.) and we will likely remove the ability to browse episodes.</li>
+  <li>This doesn't prove enough, with about 1-2GB new data to store every month. We are now investigating ways to further limit
+  data volume</li>
+  </ol>
+  <p>As a consequence, we would like you to understand that:</p>
+  <ol>
+  <li>You won't be able to use gpodder.net as a web-based podcatcher.</li>
+  <li>Your account may be archived after 6 months of inactivity.</li>
+  <li>Historical data may be reduced to only the latest action per episode per device or to only a few months.</li>
+  <li>The web interface on the gpodder.net might be reduced in scope.</li>
+  </ol>
+  <p><b>self-host your data</b> &mdash; if those limitations don't suit you, please consider <b>self-hosting mygpo</b>.
+  Hopefully the <a href="https://github.com/gpodder/mygpo/blob/master/doc/dev/installation.rst">installation section</a> of the developer documentation
+  will put you on the right track for a test deployment.</p>
+  <p>There are open PRs for <a href="https://github.com/gpodder/mygpo/pull/32">Docker compose</a> and <a href="https://github.com/gpodder/mygpo/pull/809">Kubernetes</a>
+  support that might be a better starting point to your self-hosting.</p>
+  <p>Also, there seems to be an app called <a href="https://apps.yunohost.org/app/gopodder">gpodder</a>
+  on YunoHost that might serve your self-hosting needs (totally untested and unreviewed by us).</p>
+  </div>
  {% endif %}
 
 {% endblock %}

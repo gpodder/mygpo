@@ -59,6 +59,7 @@ class RegistrationForm(forms.Form):
     email = forms.EmailField()
     password1 = forms.CharField(widget=forms.PasswordInput())
     password2 = forms.CharField(widget=forms.PasswordInput())
+    ack_limited = forms.BooleanField()
 
     def clean(self):
         cleaned_data = super(RegistrationForm, self).clean()
