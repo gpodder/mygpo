@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-30 17:44+0000\n"
+"POT-Creation-Date: 2026-09-20 21:02+0000\n"
 "PO-Revision-Date: 2026-08-30 19:54+0200\n"
 "Last-Translator: Irriep Nala Novram <allannkorh@yahoo.fr>, 2019\n"
 "Language-Team: French (https://www.transifex.com/yaron/teams/87581/fr/)\n"
@@ -492,7 +492,7 @@ msgstr "Licence"
 
 #: mygpo/directory/templates/directory/licenses.html:24
 #: mygpo/directory/templates/podcast_lists.html:24
-#: mygpo/web/templates/base.html:114 mygpo/web/templates/home.html:157
+#: mygpo/web/templates/base.html:114 mygpo/web/templates/home.html:192
 #: mygpo/web/templatetags/menu.py:48
 msgid "Podcasts"
 msgstr "Podcasts"
@@ -607,7 +607,7 @@ msgstr "Créez une liste de podcasts sur un sujet que vous aimez"
 #: mygpo/directory/templates/search.html:25
 #: mygpo/podcastlists/templates/list.html:104
 #: mygpo/subscriptions/templates/subscriptions.html:53
-#: mygpo/web/templates/base.html:115 mygpo/web/templates/home.html:158
+#: mygpo/web/templates/base.html:115 mygpo/web/templates/home.html:193
 #: mygpo/web/templatetags/menu.py:40
 msgid "Search"
 msgstr "Chercher"
@@ -930,82 +930,6 @@ msgid "Change the field 'YOUR_ADRESS' with the adress of your podcast feed."
 msgstr ""
 "Modifiez le champ \"VOTRE_ADRESSE\" avec l'adresse de votre flux de podcast."
 
-#: mygpo/publisher/templates/publisher/advertise.html:9
-#: mygpo/publisher/templates/publisher/info.html:20
-#: mygpo/web/templates/base.html:131 mygpo/web/templates/base.html:158
-#: mygpo/web/templates/home.html:174 mygpo/web/templates/home.html:201
-#: mygpo/web/templatetags/menu.py:78
-msgid "Advertise"
-msgstr "Annoncer"
-
-#: mygpo/publisher/templates/publisher/advertise.html:12
-#, python-format
-msgid "Advertise on %(sitename)s"
-msgstr "Annoncez sur %(sitename)s"
-
-#: mygpo/publisher/templates/publisher/advertise.html:18
-#, python-format
-msgid ""
-"For just € 20,-- your podcast will be shown on the <strong>front page of "
-"%(sitename)s for a week</strong>. Additionally it will be the first podcast "
-"in <strong>gPodder's list of example podcasts.</strong>"
-msgstr ""
-"Pour seulement 20 €, votre podcast sera diffusé sur la <strong>pendant une "
-"semaine sur la première page de %(sitename)s</strong>. De plus, ce sera le "
-"premier podcast de la <strong>liste des exemples de podcasts gPodder.</"
-"strong>"
-
-#: mygpo/publisher/templates/publisher/advertise.html:20
-msgid ""
-"You can chose when your advertisement will be active, and the text that will "
-"be displayed for your podcast."
-msgstr ""
-"Vous pouvez choisir quand votre publicité sera active et le texte qui sera "
-"affiché pour votre podcast."
-
-#: mygpo/publisher/templates/publisher/advertise.html:22
-msgid "Front Page"
-msgstr "Page de garde"
-
-#: mygpo/publisher/templates/publisher/advertise.html:23
-#, python-format
-msgid ""
-"Your podcast will be displayed on the front page of %(sitename)s for both "
-"logged-in and anonymous users."
-msgstr ""
-"Votre podcast sera affiché sur la page d'accueil de %(sitename)s pour les "
-"utilisateurs connectés et ceux anonymes."
-
-#: mygpo/publisher/templates/publisher/advertise.html:25
-msgid "Example Podcasts"
-msgstr "Exemple de podcasts"
-
-#: mygpo/publisher/templates/publisher/advertise.html:26
-msgid ""
-"The gPodder client offers a list of example podcasts when started for the "
-"first time. This list is loaded from the web on demand. For the time of your "
-"advertisement, your podcast will be the first in the list."
-msgstr ""
-"Le client gPodder propose une liste d’exemples de podcasts lors du premier "
-"démarrage. Cette liste est chargée à partir du Web à la demande. Pendant le "
-"temps de votre annonce, votre podcast sera le premier de la liste."
-
-#: mygpo/publisher/templates/publisher/advertise.html:28
-msgid "Visitors"
-msgstr "Visiteurs"
-
-#: mygpo/publisher/templates/publisher/advertise.html:29
-msgid ""
-"Both the front page and the list of example podcasts are accessed by more "
-"than 1000 people daily, who are actively looking for interesting podcasts. "
-"We do, however, not guarantee a certain number of visitors during your "
-"advertisement period."
-msgstr ""
-"Chaque jour, plus de 1 000 personnes consultent la page d'accueil et la "
-"liste des exemples de podcasts, qui recherchent activement des podcasts "
-"intéressants. Cependant, nous ne garantissons pas un certain nombre de "
-"visiteurs pendant votre période d'annonce."
-
 #: mygpo/publisher/templates/publisher/episode.html:31
 msgid "Unnamed Episode"
 msgstr "Épisode sans nom"
@@ -1121,6 +1045,11 @@ msgstr "Services de publication"
 #, python-format
 msgid "%(sitename)s offers several services for podcast publishers."
 msgstr "%(sitename)s offre plusieurs services aux éditeurs de podcasts."
+
+#: mygpo/publisher/templates/publisher/info.html:20
+#: mygpo/web/templatetags/menu.py:78
+msgid "Advertise"
+msgstr "Annoncer"
 
 #: mygpo/publisher/templates/publisher/info.html:21
 #, python-format
@@ -1243,7 +1172,7 @@ msgid "Update now"
 msgstr "Mettre à jour maintenant"
 
 #: mygpo/publisher/templates/publisher/podcast.html:117 mygpo/web/forms.py:72
-#: mygpo/web/templates/base.html:138 mygpo/web/templates/home.html:181
+#: mygpo/web/templates/base.html:130 mygpo/web/templates/home.html:208
 msgid "Twitter"
 msgstr "Twitter"
 
@@ -1668,18 +1597,24 @@ msgstr "Créer un compte"
 msgid "You are already registered."
 msgstr "Vous êtes déjà inscrit."
 
-#: mygpo/users/templates/registration/registration_form.html:72
+#: mygpo/users/templates/registration/registration_form.html:74
+msgid ""
+"I understand gpodder.net is a free community service and that functionality "
+"might be reduced or stopped at any time"
+msgstr ""
+
+#: mygpo/users/templates/registration/registration_form.html:84
 #: mygpo/web/templates/base.html:51 mygpo/web/templates/home.html:46
 #: mygpo/web/templates/home.html:102 mygpo/web/templates/login.html:47
 #: mygpo/web/templatetags/menu.py:26
 msgid "Register"
 msgstr "S'inscrire"
 
-#: mygpo/users/templates/registration/registration_form.html:87
+#: mygpo/users/templates/registration/registration_form.html:130
 msgid "Activation Mail"
 msgstr "Courriel d'activation"
 
-#: mygpo/users/templates/registration/registration_form.html:88
+#: mygpo/users/templates/registration/registration_form.html:131
 msgid ""
 "After registration, you'll receive an activation mail to confirm the "
 "validity of your email address."
@@ -1687,7 +1622,7 @@ msgstr ""
 "Après votre inscription, vous recevrez un courriel d'activation confirmant "
 "la validité de votre adresse courriel."
 
-#: mygpo/users/templates/registration/registration_form.html:90
+#: mygpo/users/templates/registration/registration_form.html:133
 #, python-format
 msgid ""
 "If it doesn't arrive, you can <a href=\"%(resend-activation-url)s\">resend</"
@@ -1756,37 +1691,37 @@ msgstr "Impossible de télécharger des abonnements: {err}"
 msgid "Your subscription will be updated in a moment."
 msgstr "Votre abonnement sera mis à jour dans un instant."
 
-#: mygpo/users/views/registration.py:90
+#: mygpo/users/views/registration.py:91
 msgid "Username or email address already in use"
 msgstr "Nom d'utilisateur ou adresse courriel déjà utilisé"
 
-#: mygpo/users/views/registration.py:155
+#: mygpo/users/views/registration.py:156
 msgid "The activation link is either not valid or has already expired."
 msgstr "Le lien d'activation n'est pas valide ou a déjà expiré."
 
-#: mygpo/users/views/registration.py:163
+#: mygpo/users/views/registration.py:164
 msgid ""
 "Your account has been archived. It can't be re-activated automatically. "
 "Please see https://github.com/gpodder/mygpo/issues/866"
 msgstr ""
 
-#: mygpo/users/views/registration.py:170
+#: mygpo/users/views/registration.py:171
 msgid "Your user has been activated. You can log in now."
 msgstr "Votre utilisateur a été activé. Vous pouvez vous connecter maintenant."
 
-#: mygpo/users/views/registration.py:188
+#: mygpo/users/views/registration.py:189
 msgid "Either username or email address are required."
 msgstr "Un nom d'utilisateur ou une adresse courriel sont requis."
 
-#: mygpo/users/views/registration.py:208 mygpo/users/views/user.py:139
+#: mygpo/users/views/registration.py:209 mygpo/users/views/user.py:139
 msgid "User does not exist."
 msgstr "L'utilisateur n'existe pas."
 
-#: mygpo/users/views/registration.py:212
+#: mygpo/users/views/registration.py:213
 msgid "Your data has been archived."
 msgstr "Votre compte a été archivé."
 
-#: mygpo/users/views/registration.py:221
+#: mygpo/users/views/registration.py:222
 msgid "Your account already has been activated. Go ahead and log in."
 msgstr "Votre compte a déjà été activé. Allez-y et connectez-vous."
 
@@ -1924,123 +1859,60 @@ msgstr "Compte"
 msgid "Login"
 msgstr "S'identifier"
 
-#: mygpo/web/templates/base.html:112 mygpo/web/templates/home.html:155
+#: mygpo/web/templates/base.html:112 mygpo/web/templates/home.html:190
 #: mygpo/web/templatetags/menu.py:36
 msgid "Discover"
 msgstr "Découvrez"
 
-#: mygpo/web/templates/base.html:113 mygpo/web/templates/home.html:156
+#: mygpo/web/templates/base.html:113 mygpo/web/templates/home.html:191
 #: mygpo/web/templatetags/menu.py:38
 msgid "Directory"
 msgstr "Répertoire"
 
-#: mygpo/web/templates/base.html:121 mygpo/web/templates/home.html:164
+#: mygpo/web/templates/base.html:121 mygpo/web/templates/home.html:199
 msgid "Support"
 msgstr "Soutien"
 
-#: mygpo/web/templates/base.html:122 mygpo/web/templates/home.html:165
+#: mygpo/web/templates/base.html:122 mygpo/web/templates/home.html:200
 #: mygpo/web/templatetags/menu.py:28
 msgid "Docs"
 msgstr "Docs"
 
-#: mygpo/web/templates/base.html:123 mygpo/web/templates/home.html:166
+#: mygpo/web/templates/base.html:123 mygpo/web/templates/home.html:201
 msgid "Questions"
 msgstr "Des questions"
 
-#: mygpo/web/templates/base.html:129 mygpo/web/templates/home.html:172
-msgid "Support&nbsp;Us"
-msgstr "Nous&nbsp;Soutenir"
-
-#: mygpo/web/templates/base.html:130 mygpo/web/templates/contribute.html:22
-#: mygpo/web/templates/home.html:173
-msgid "Donate"
-msgstr "Faire un don"
-
-#: mygpo/web/templates/base.html:137 mygpo/web/templates/home.html:180
+#: mygpo/web/templates/base.html:129 mygpo/web/templates/home.html:207
 msgid "Follow"
 msgstr "Suivre"
 
-#: mygpo/web/templates/base.html:139 mygpo/web/templates/home.html:182
+#: mygpo/web/templates/base.html:131 mygpo/web/templates/home.html:209
 msgid "Blog"
 msgstr "Blog"
 
-#: mygpo/web/templates/base.html:140 mygpo/web/templates/home.html:183
+#: mygpo/web/templates/base.html:132 mygpo/web/templates/home.html:210
 msgid "Blog&nbsp;(RSS)"
 msgstr "Blog&nbsp;(RSS)"
 
-#: mygpo/web/templates/base.html:146 mygpo/web/templates/home.html:189
+#: mygpo/web/templates/base.html:138 mygpo/web/templates/home.html:216
 msgid "Develop"
 msgstr "Développer"
 
-#: mygpo/web/templates/base.html:147 mygpo/web/templates/home.html:190
+#: mygpo/web/templates/base.html:139 mygpo/web/templates/home.html:217
 msgid "API"
 msgstr "API"
 
-#: mygpo/web/templates/base.html:148 mygpo/web/templates/home.html:191
+#: mygpo/web/templates/base.html:140 mygpo/web/templates/home.html:218
 msgid "Libraries"
 msgstr "Bibliothèques"
 
-#: mygpo/web/templates/base.html:149 mygpo/web/templates/home.html:192
+#: mygpo/web/templates/base.html:141 mygpo/web/templates/home.html:219
 msgid "Clients"
 msgstr "Clients"
 
-#: mygpo/web/templates/base.html:155 mygpo/web/templates/home.html:198
-#: mygpo/web/templatetags/menu.py:75
-msgid "Publish"
-msgstr "Publier"
-
-#: mygpo/web/templates/base.html:156 mygpo/web/templates/home.html:199
-msgid "Get&nbsp;Access"
-msgstr "Avoir &nbsp;accès"
-
-#: mygpo/web/templates/base.html:157 mygpo/web/templates/home.html:200
-msgid "Link&nbsp;To&nbsp;Us"
-msgstr "Lien&nbsp;vers&nbsp;nous"
-
-#: mygpo/web/templates/base.html:166 mygpo/web/templates/home.html:208
+#: mygpo/web/templates/base.html:149 mygpo/web/templates/home.html:226
 msgid "hosting provided by tornadovps.com"
 msgstr "hébergement fourni par tornadovps.com"
-
-#: mygpo/web/templates/contribute.html:8 mygpo/web/templatetags/menu.py:29
-msgid "Contribute"
-msgstr "Contribuer"
-
-#: mygpo/web/templates/contribute.html:11
-msgid "Contribute to gpodder.net"
-msgstr "Contribuer à gpodder.net"
-
-#: mygpo/web/templates/contribute.html:16
-msgid ""
-"gpodder.net is run as a hobby project without continuous funding for "
-"servers, storage and bandwidth. We rely on contributors and donations to "
-"keep the site running and improve it constantly."
-msgstr ""
-"gpodder.net est géré comme un projet de loisir sans financement continu pour "
-"les serveurs, le stockage et la bande passante. Nous comptons sur les "
-"contributeurs et les dons pour maintenir le site en fonctionnement et "
-"l’améliorer constamment."
-
-#: mygpo/web/templates/contribute.html:18
-msgid "Work"
-msgstr "Travail"
-
-#: mygpo/web/templates/contribute.html:19
-msgid ""
-"If you want to contribute to gpodder.net by writing code, check out the <a "
-"href=\"/developer/\">Development</a> page. We also appreciate contributions "
-"of non-coding work, such as web and interface design, server operations, "
-"testing, etc."
-msgstr ""
-"Si vous voulez contribuer à gpodder.net en écrivant du code, jetez un œil à "
-"la page de <a href=\"/developer/\">Dévelopment</a>. Nous apprécions "
-"également les contributions de travaux autres que de codage, tels que la "
-"conception Web et d'interface, les opérations de serveur, les tests, etc.."
-
-#: mygpo/web/templates/contribute.html:23
-msgid ""
-"If you want to support gpodder.net financially, you can donate via <a "
-"href=\"https://paypal.me/pools/c/8lxTu5kqTp\">PayPal</a>."
-msgstr ""
 
 #: mygpo/web/templates/csrf.html:8
 msgid "Attention!"
@@ -2675,6 +2547,10 @@ msgstr "Accueil"
 msgid "Archived"
 msgstr ""
 
+#: mygpo/web/templatetags/menu.py:29
+msgid "Contribute"
+msgstr "Contribuer"
+
 #: mygpo/web/templatetags/menu.py:32
 msgid "Help"
 msgstr "Aide"
@@ -2710,6 +2586,10 @@ msgstr "Ma page d'utilisateur"
 #: mygpo/web/templatetags/menu.py:73
 msgid "Privacy"
 msgstr "Vie privée"
+
+#: mygpo/web/templatetags/menu.py:75
+msgid "Publish"
+msgstr "Publier"
 
 #: mygpo/web/templatetags/menu.py:79
 msgid "Link to gpodder.net"
@@ -2749,6 +2629,105 @@ msgstr[1] "%(hours)d heures"
 #: mygpo/web/views.py:131
 msgid "another site"
 msgstr "un autre site"
+
+#, python-format
+#~ msgid "Advertise on %(sitename)s"
+#~ msgstr "Annoncez sur %(sitename)s"
+
+#, python-format
+#~ msgid ""
+#~ "For just € 20,-- your podcast will be shown on the <strong>front page of "
+#~ "%(sitename)s for a week</strong>. Additionally it will be the first "
+#~ "podcast in <strong>gPodder's list of example podcasts.</strong>"
+#~ msgstr ""
+#~ "Pour seulement 20 €, votre podcast sera diffusé sur la <strong>pendant "
+#~ "une semaine sur la première page de %(sitename)s</strong>. De plus, ce "
+#~ "sera le premier podcast de la <strong>liste des exemples de podcasts "
+#~ "gPodder.</strong>"
+
+#~ msgid ""
+#~ "You can chose when your advertisement will be active, and the text that "
+#~ "will be displayed for your podcast."
+#~ msgstr ""
+#~ "Vous pouvez choisir quand votre publicité sera active et le texte qui "
+#~ "sera affiché pour votre podcast."
+
+#~ msgid "Front Page"
+#~ msgstr "Page de garde"
+
+#, python-format
+#~ msgid ""
+#~ "Your podcast will be displayed on the front page of %(sitename)s for both "
+#~ "logged-in and anonymous users."
+#~ msgstr ""
+#~ "Votre podcast sera affiché sur la page d'accueil de %(sitename)s pour les "
+#~ "utilisateurs connectés et ceux anonymes."
+
+#~ msgid "Example Podcasts"
+#~ msgstr "Exemple de podcasts"
+
+#~ msgid ""
+#~ "The gPodder client offers a list of example podcasts when started for the "
+#~ "first time. This list is loaded from the web on demand. For the time of "
+#~ "your advertisement, your podcast will be the first in the list."
+#~ msgstr ""
+#~ "Le client gPodder propose une liste d’exemples de podcasts lors du "
+#~ "premier démarrage. Cette liste est chargée à partir du Web à la demande. "
+#~ "Pendant le temps de votre annonce, votre podcast sera le premier de la "
+#~ "liste."
+
+#~ msgid "Visitors"
+#~ msgstr "Visiteurs"
+
+#~ msgid ""
+#~ "Both the front page and the list of example podcasts are accessed by more "
+#~ "than 1000 people daily, who are actively looking for interesting "
+#~ "podcasts. We do, however, not guarantee a certain number of visitors "
+#~ "during your advertisement period."
+#~ msgstr ""
+#~ "Chaque jour, plus de 1 000 personnes consultent la page d'accueil et la "
+#~ "liste des exemples de podcasts, qui recherchent activement des podcasts "
+#~ "intéressants. Cependant, nous ne garantissons pas un certain nombre de "
+#~ "visiteurs pendant votre période d'annonce."
+
+#~ msgid "Support&nbsp;Us"
+#~ msgstr "Nous&nbsp;Soutenir"
+
+#~ msgid "Donate"
+#~ msgstr "Faire un don"
+
+#~ msgid "Get&nbsp;Access"
+#~ msgstr "Avoir &nbsp;accès"
+
+#~ msgid "Link&nbsp;To&nbsp;Us"
+#~ msgstr "Lien&nbsp;vers&nbsp;nous"
+
+#~ msgid "Contribute to gpodder.net"
+#~ msgstr "Contribuer à gpodder.net"
+
+#~ msgid ""
+#~ "gpodder.net is run as a hobby project without continuous funding for "
+#~ "servers, storage and bandwidth. We rely on contributors and donations to "
+#~ "keep the site running and improve it constantly."
+#~ msgstr ""
+#~ "gpodder.net est géré comme un projet de loisir sans financement continu "
+#~ "pour les serveurs, le stockage et la bande passante. Nous comptons sur "
+#~ "les contributeurs et les dons pour maintenir le site en fonctionnement et "
+#~ "l’améliorer constamment."
+
+#~ msgid "Work"
+#~ msgstr "Travail"
+
+#~ msgid ""
+#~ "If you want to contribute to gpodder.net by writing code, check out the "
+#~ "<a href=\"/developer/\">Development</a> page. We also appreciate "
+#~ "contributions of non-coding work, such as web and interface design, "
+#~ "server operations, testing, etc."
+#~ msgstr ""
+#~ "Si vous voulez contribuer à gpodder.net en écrivant du code, jetez un œil "
+#~ "à la page de <a href=\"/developer/\">Dévelopment</a>. Nous apprécions "
+#~ "également les contributions de travaux autres que de codage, tels que la "
+#~ "conception Web et d'interface, les opérations de serveur, les tests, etc.."
 
 #~ msgid "Start your Advertisement"
 #~ msgstr "Démarrer votre annonce"
