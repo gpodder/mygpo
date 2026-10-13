@@ -51,7 +51,7 @@ Save Settings
 
     **Example request**:
 
-    .. sourcecode:: http
+    .. sourcecode:: json
 
         {
             "set": {"setting1": "value1", "setting2": "value2"},
@@ -75,6 +75,7 @@ Save Settings
     .. sourcecode: http
 
         HTTP/1.1 200 OK
+        Content-Type: application/json
 
         {
             "setting1": "value1",
@@ -104,7 +105,7 @@ Get Settings
 
     The response contains all settings that the scope currently has
 
-    .. sourcecode:: http
+    .. sourcecode:: json
 
         {
             "setting1": "value1",

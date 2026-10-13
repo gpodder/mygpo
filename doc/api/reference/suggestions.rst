@@ -14,13 +14,14 @@ Retrieve Suggested Podcasts
 
     .. sourcecode:: http
 
-        GET /suggestions/10.opml
+        GET /suggestions/10.opml HTTP/1.1
 
     **Example response**:
 
     .. sourcecode:: http
 
         HTTP/1.1 200 OK
+        Content-Type: application/json
 
         [
           {

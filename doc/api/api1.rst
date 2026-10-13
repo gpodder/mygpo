@@ -429,7 +429,7 @@ timestamp (that the client SHOULD save and use for subsequent requests):
 
 .. code-block:: json
 
-    {"actions": ''(list of episode actions here - see above for details)'',
+    {"actions": "(list of episode actions here - see above for details)",
      "timestamp": 12345}
 
 

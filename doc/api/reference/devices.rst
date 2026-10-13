@@ -21,7 +21,8 @@ Update Device Data
 
     .. sourcecode:: http
 
-        POST /api/2/devices/a-user/somedevice-123.json
+        POST /api/2/devices/a-user/somedevice-123.json HTTP/1.1
+        Content-Type: application/json
 
         {
             "caption": "gPodder on my Lappy",
@@ -55,6 +56,7 @@ List Devices
     .. sourcecode:: http
 
         HTTP/1.1 200 OK
+        Content-Type: application/json
 
         [
           {
@@ -96,6 +98,7 @@ Get Device Updates
     .. sourcecode:: http
 
         HTTP/1.1 200 OK
+        Content-Type: application/json
 
         {
             "add":     [
@@ -126,7 +129,7 @@ Get Device Updates
              }
             ],
 
-           "timestamp":   <timestamp>
+           "timestamp":   1302168606
         }
 
     :query since: ``timestamp`` when updates have last been retrieved

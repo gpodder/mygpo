@@ -166,13 +166,14 @@ Podcast Toplist
 
     .. sourcecode:: http
 
-        GET /toplist/50.json
+        GET /toplist/50.json HTTP/1.1
 
     **Example response**:
 
     .. sourcecode:: http
 
         HTTP/1.1 200 OK
+        Content-Type: application/json
 
         [
          {

@@ -50,7 +50,8 @@ Upload Episode Actions
 
     .. sourcecode:: http
 
-        POST /api/2/episodes/some-user.json
+        POST /api/2/episodes/some-user.json HTTP/1.1
+        Content-Type: application/json
 
         [
           {
@@ -93,6 +94,7 @@ Upload Episode Actions
     .. sourcecode:: http
 
         HTTP/1.1 200 OK
+        Content-Type: application/json
 
         {
             "timestamp": 1337,
@@ -140,6 +142,7 @@ Get Episode Actions
     .. sourcecode:: http
 
         HTTP/1.1 200 OK
+        Content-Type: application/json
 
         {
             "actions": [],
