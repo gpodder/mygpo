@@ -12,4 +12,4 @@ def setup(app):
     except ImportError:
         pass  # not fatal if we have old (or no) Pygments and no pygments-json
     else:
-        app.add_lexer("json", JsonLexer())
+        app.add_lexer("json", JsonLexer)
