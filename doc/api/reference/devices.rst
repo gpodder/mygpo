@@ -21,7 +21,7 @@ Update Device Data
 
     .. sourcecode:: http
 
-        POST /api/2/devices/a-user/somedevice-123.json
+        POST /api/2/devices/a-user/somedevice-123.json HTTP/1.1
 
         {
             "caption": "gPodder on my Lappy",

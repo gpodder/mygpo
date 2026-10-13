@@ -50,7 +50,7 @@ Upload Episode Actions
 
     .. sourcecode:: http
 
-        POST /api/2/episodes/some-user.json
+        POST /api/2/episodes/some-user.json HTTP/1.1
 
         [
           {

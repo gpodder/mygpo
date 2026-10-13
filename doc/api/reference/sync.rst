@@ -12,7 +12,7 @@ Get Sync Status
 
     **Example response**:
 
-    .. sourcecode:: http
+    .. sourcecode:: json
 
         {
           "synchronized": [
@@ -38,7 +38,7 @@ Start / Stop Sync
 
     **Example request**:
 
-    .. sourcecode:: http
+    .. sourcecode:: json
 
         {
           "synchronize": [
@@ -52,7 +52,7 @@ Start / Stop Sync
 
     **Example status**:
 
-    .. sourcecode:: http
+    .. sourcecode:: json
 
         {
           "synchronized": [

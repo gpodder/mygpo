@@ -14,7 +14,7 @@ Get Subscriptions of Device
 
     .. sourcecode:: http
 
-        GET /subscriptions/bob/asdf.opml
+        GET /subscriptions/bob/asdf.opml HTTP/1.1
 
     :param username: username for which subscriptions should be returned
     :param deviceid: see :ref:`devices`
@@ -42,7 +42,7 @@ Get All Subscriptions
 
     .. sourcecode:: http
 
-        GET /subscriptions/bob.opml
+        GET /subscriptions/bob.opml HTTP/1.1
 
     This can be used to present the user a list of podcasts when the
     application starts for the first time.
@@ -79,7 +79,7 @@ Upload Subscriptions of Device
 
     .. sourcecode:: http
 
-        PUT /subscriptions/john/e9c4ea4ae004efac40.txt
+        PUT /subscriptions/john/e9c4ea4ae004efac40.txt HTTP/1.1
 
     :param username: username for which subscriptions should be uploaded
     :param deviceid: see :ref:`devices`
@@ -111,7 +111,7 @@ Upload Subscription Changes
 
     **Example request**:
 
-    .. sourcecode:: http
+    .. sourcecode:: json
 
         {
             "add": ["http://example.com/feed.rss", "http://example.org/podcast.php"],
@@ -134,7 +134,7 @@ Upload Subscription Changes
 
     **Example response**:
 
-    .. sourcecode:: http
+    .. sourcecode:: json
 
         {
           "timestamp": 1337,
@@ -182,7 +182,7 @@ Get Subscription Changes
     In case nothing has changed, the server returns something like the
     following JSON content.
 
-    .. sourcecode:: http
+    .. sourcecode:: json
 
         {
            "add": [],
