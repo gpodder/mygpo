@@ -129,7 +129,7 @@ Get Device Updates
              }
             ],
 
-           "timestamp":   <timestamp>
+           "timestamp":   1302168606
         }
 
     :query since: ``timestamp`` when updates have last been retrieved
