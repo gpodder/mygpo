@@ -75,6 +75,7 @@ Save Settings
     .. sourcecode: http
 
         HTTP/1.1 200 OK
+        Content-Type: application/json
 
         {
             "setting1": "value1",

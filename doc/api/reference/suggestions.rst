@@ -21,6 +21,7 @@ Retrieve Suggested Podcasts
     .. sourcecode:: http
 
         HTTP/1.1 200 OK
+        Content-Type: application/json
 
         [
           {
