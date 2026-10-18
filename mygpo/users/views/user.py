@@ -1,5 +1,7 @@
 import logging
 import os
+from datetime import datetime, timedelta
+from uuid import uuid4
 
 from django.shortcuts import render
 from django.http import (
@@ -9,8 +11,10 @@ from django.http import (
     HttpResponseNotFound,
 )
 from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.sites.requests import RequestSite
+from django.db import transaction, IntegrityError
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import never_cache
 from django.template.loader import render_to_string
@@ -26,7 +30,8 @@ from oauth2client.client import FlowExchangeError
 from mygpo.settings import ARCHIVE_ROOT
 from mygpo.web.forms import RestorePasswordForm
 from mygpo.constants import DEFAULT_LOGIN_REDIRECT
-from mygpo.users.models import UserProxy
+from mygpo.users.models import UserArchive, UserProxy
+from mygpo.users.tasks import generate_archive
 from mygpo.users.views.registration import send_activation_email
 from mygpo.utils import random_token
 
@@ -187,9 +192,29 @@ class ArchivedView(View):
         )
 
 
+@login_required
 @never_cache
-def download_archive(request):
-    """download a user's archive.
+def download_archive(request, *, archive_id):
+    """download a user's archive."""
+    try:
+        archive = UserArchive.objects.filter(user=request.user, id=archive_id).get()
+    except UserArchive.DoesNotExist:
+        return HttpResponseNotFound("Invalid Archive id")
+
+    if archive.path:
+        archive_path = os.path.abspath(os.path.normpath(archive.path))
+        if os.path.dirname(archive_path) == os.path.abspath(
+            os.path.normpath(ARCHIVE_ROOT)
+        ):
+            return FileResponse(open(archive_path, "rb"), as_attachment=True)
+        return HttpResponseBadRequest("Invalid archive path")
+
+    return HttpResponseBadRequest("Invalid archive state")
+
+
+@never_cache
+def download_any_archive(request):
+    """download an archived user's archive.
 
     Requires the username and password to match the user's.
     A check for correct folder is done to prevent arbitrary file exfiltration in case of database corruption.
@@ -202,10 +227,120 @@ def download_archive(request):
     if not user:
         return HttpResponseNotFound("Invalid user or password")
 
-    if not user.is_active and user.profile.archive_path is not None:
-        archive_path = os.path.abspath(os.path.normpath(user.profile.archive_path))
-        if os.path.dirname(archive_path) == ARCHIVE_ROOT:
+    try:
+        archive = UserArchive.objects.filter(user=user).first()
+    except UserArchive.DoesNotExist:
+        return HttpResponseNotFound("No archive for this user")
+
+    if archive.path:
+        archive_path = os.path.abspath(os.path.normpath(archive.path))
+        if os.path.dirname(archive_path) == os.path.abspath(
+            os.path.normpath(ARCHIVE_ROOT)
+        ):
             return FileResponse(open(archive_path, "rb"), as_attachment=True)
         return HttpResponseBadRequest("Invalid archive path")
 
-    return HttpResponseBadRequest("Invalid user state")
+    return HttpResponseBadRequest("Invalid archive state")
+
+
+RETRY_UUID_NON_UNIQUE = 3
+
+
+@login_required
+@never_cache
+def create_archive(request):
+    """download a user's archive.
+
+    Requires the username and password to match the user's.
+    A check for correct folder is done to prevent arbitrary file exfiltration in case of database corruption.
+    It will only allow from within the ARCHIVE_ROOT (test will be adjusted later if necessary).
+    """
+    user = request.user
+
+    existing_archives = user.userarchive_set.all()
+    if existing_archives and (datetime.now() - existing_archives[0].date) < timedelta(
+        days=1
+    ):
+        messages.error(
+            request,
+            _(
+                "An archive from less than 24 hours already exists."
+                "Please refrain from generating archives too frequently."
+            ),
+        )
+        return HttpResponseRedirect(reverse("account"))
+
+    for i in range(RETRY_UUID_NON_UNIQUE):
+        try:
+            a = UserArchive(id=uuid4(), user=user, date=datetime.now())
+            a.save(force_insert=True)
+            logger.debug(
+                "Created archive for %s (%s) date %s", user.username, user.id, a.date
+            )
+            break
+        except IntegrityError:
+            if i == RETRY_UUID_NON_UNIQUE - 1:
+                logger.warning(
+                    "Unable to create unique archive id for %s (%s)",
+                    user.username,
+                    user.id,
+                    exc_info=True,
+                )
+                messages.error(
+                    request,
+                    _(
+                        "An error prevented us from creating the archive."
+                        "Please retry at a later time."
+                    ),
+                )
+                return HttpResponseRedirect(reverse("account"))
+
+    a.task_id = generate_archive.delay(a.id)
+    a.save()
+    messages.success(
+        request,
+        _("The archive is generating in the background..."),
+    )
+    return HttpResponseRedirect(reverse("account"))
+
+
+@never_cache
+def reactivate(request):
+    """reactivate a user.
+
+    Requires the username and password to match the user's.
+    """
+    user = authenticate(
+        username=request.POST.get("user"), password=request.POST.get("pwd")
+    )
+
+    if not user:
+        return HttpResponseNotFound("Invalid user or password")
+
+    if user.is_active:
+        messages.success(
+            request,
+            _("Your account already has been " "activated. Go ahead and log in."),
+        )
+        return HttpResponseRedirect(reverse("login"))
+    if not user.is_active and user.profile.archive_path:
+        user.profile.archive_path = ''
+        user.profile.archived_date = None
+        user.profile.save()
+        if user.profile.activation_key is None:
+            user.is_active = True
+            user.save()
+            messages.success(
+                request,
+                _("Your account has been reactivated. Go ahead and log in."),
+            )
+            return HttpResponseRedirect(reverse("login"))
+    send_activation_email(user, request)
+    messages.error(
+        request,
+        _(
+            "Please activate your account first. "
+            "We have just re-sent your activation email"
+        ),
+    )
+    return HttpResponseRedirect(reverse("login"))

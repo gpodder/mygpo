@@ -431,3 +431,25 @@ class HistoryEntry(object):
             entry.device = device
 
         return entries
+
+
+class UserArchive(UUIDModel, DeleteableModel):
+    """A user's data archive (can be multiple)"""
+
+    # the user to which the Archive belongs
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    # The path to the archive
+    path = models.TextField(blank=True)
+
+    # The date of the archive
+    date = models.DateTimeField(null=True)
+
+    # The task generating the archive, if any
+    task_id = models.TextField(null=True)
+
+    class Meta:
+        ordering = ["-date"]
+        indexes = [
+            models.Index(fields=['user']),
+        ]
