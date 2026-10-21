@@ -1,9 +1,10 @@
 import re
 import collections
 import dateutil.parser
+from uuid import uuid4
 
 from django.core.validators import RegexValidator
-from django.db import transaction, models
+from django.db import transaction, models, IntegrityError
 from django.db.models import Q
 from django.contrib.auth.models import User as DjangoUser
 from django.utils.translation import gettext_lazy as _
@@ -431,3 +432,45 @@ class HistoryEntry(object):
             entry.device = device
 
         return entries
+
+
+RETRY_UUID_NON_UNIQUE = 3
+
+
+class UserArchive(UUIDModel, DeleteableModel):
+    """A user's data archive (can be multiple)"""
+
+    # the user to which the Archive belongs
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    # The path to the archive
+    path = models.TextField(blank=True)
+
+    # The date of the archive
+    date = models.DateTimeField(null=True)
+
+    # The task generating the archive, if any
+    task_id = models.TextField(null=True)
+
+    class Meta:
+        ordering = ["-date"]
+        indexes = [
+            models.Index(fields=['user']),
+        ]
+
+    def save_with_id_retry(self, logger=logger):
+        for i in range(RETRY_UUID_NON_UNIQUE):
+            # try with new UUID
+            self.id = uuid4()
+            try:
+                self.save(force_insert=True)
+                break
+            except IntegrityError:
+                logger.warning(
+                    "Unable to create unique archive with id %s for %s (%s)",
+                    self.id,
+                    self.user.username,
+                    self.user.id,
+                )
+                if i == RETRY_UUID_NON_UNIQUE - 1:
+                    raise

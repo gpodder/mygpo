@@ -4,13 +4,16 @@ import json
 import subprocess
 import sys
 import re
-from datetime import datetime, timedelta, date
 import time
 import hashlib
 import urllib.parse
 import urllib.request, urllib.parse, urllib.error
 import urllib.request, urllib.error, urllib.parse
 import zlib
+
+from datetime import datetime, timedelta, date
+from functools import wraps
+from time import perf_counter
 
 from django.db import transaction, IntegrityError
 from django.conf import settings
@@ -678,3 +681,16 @@ def set_ordered_entries(
         delete = [s.pk for s in existing.values()]
         logger.info("Deleting %d entries", len(delete))
         EntryClass.objects.filter(id__in=delete).delete()
+
+
+def timed(f):
+    """Wrap a function to show how long it took to run it."""
+
+    @wraps(f)
+    def wrapper(*args, **kwds):
+        before = perf_counter()
+        ret = f(*args, **kwds)
+        print("D: run %s in %.1fs" % (f.__qualname__, (perf_counter() - before)))
+        return ret
+
+    return wrapper

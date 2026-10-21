@@ -28,6 +28,15 @@ urlpatterns = [
         name="resent-activation",
     ),
     path("account/", settings.account, name="account"),
+    path(
+        "account/archive/<uuid:archive_id>",
+        user.download_archive,
+        name="user-download-archive",
+    ),
+    path(
+        "account/archive", user.download_any_archive, name="user-download-any-archive"
+    ),
+    path("account/create_archive", user.create_archive, name="user-create-archive"),
     path("account/privacy", settings.privacy, name="privacy"),
     path("account/profile", settings.ProfileView.as_view(), name="profile"),
     path(
@@ -86,5 +95,5 @@ urlpatterns = [
     path("login/", user.LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(next_page="home"), name="logout"),
     path("archived/", user.ArchivedView.as_view(), name="user-archived"),
-    path("archived/download", user.download_archive, name="user-download-archive"),
+    path("archived/reactivate", user.reactivate, name="user-reactivate"),
 ]

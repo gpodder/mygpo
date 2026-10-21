@@ -65,7 +65,7 @@ def create_subscriptionlist(request):
         .prefetch_related("podcast__slugs")
     )
 
-    # grou clients by subscribed podcasts
+    # group clients by subscribed podcasts
     subscription_list = {}
     for subscription in subscriptions:
         podcast = subscription.podcast

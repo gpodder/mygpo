@@ -23,6 +23,9 @@
   <li>
    <a href="#profile" data-toggle="tab">Public Profile</a>
   </li>
+  <li>
+   <a href="#archives" data-toggle="tab">Archives</a>
+  </li>
  </ul>
 
  <div class="tab-content">
@@ -143,7 +146,69 @@
 
    </form>
 
+  </div> <!-- pane end -->
+
+  <div class="tab-pane" id="archives">
+
+    <div class="alert alert-info alert-block">
+    <p>Archives contain all your subscriptions, history,
+    as well as related podcast and episode information at that time.</p>
+
+    <p>For instance you'll find all your subscriptions in OPML format in the <code>subscriptions.opml</code> file
+    of the archive. This format is used to import podcast subscriptions in a podcatcher, like gPodder desktop
+    or AntennaPod.</p>
+
+    <p>Additional data is in json format in various files of the archive.</p>
+
+    <p>The archive doesn't include podcast or episode cover art, as it would make it too
+    large to manage.</p>
   </div>
+
+
+    {% if user.userarchive_set.exists %}
+    <p>Here is a list of existing archives for your account.</p>
+    <ul>
+    {% for archive in user.userarchive_set.all %}
+      <li>
+      <p>
+      {% if archive.path %}
+      <a href="{% url "user-download-archive" archive.id %}">{{ archive.date }}</a>
+      {% elif archive.task_id %}
+      {{ archive.date }} (in progress...)
+      {% else %}
+      {{ archive.date }} (broken)
+      {% endif %}
+      </p>
+      </li>
+    {% endfor %}
+    </ul>
+    {% else %}
+    <blockquote>
+    <p class="text-info">There are no archives for your account yet.</p>
+    </blockquote>
+    {% endif %}
+
+    <p>You may generate a new archive as needed.
+    Note that generating the archive is costly so it is only allowed once per 24 hours.
+    </p>
+
+   <div class="panel panel-warning">
+    <div class="panel-heading">
+     <h2 class="panel-title">{% trans "Archive lifecycle" %}</h2>
+    </div>
+   <div class="panel-body">
+   <p>Only the latest archive will be kept: the other ones are purged regularly.</p>
+
+   </div>
+   </div>
+
+   <form role="form" action="{% url "user-create-archive" %}" method="POST" class="form-horizontal">
+    {% csrf_token %}
+
+    <button class="btn btn-primary" type="submit">{% trans "Archive" %}</button>
+   </form>
+
+  </div> <!-- pane end -->
 
  </div>
 

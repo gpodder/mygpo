@@ -45,7 +45,8 @@
 
 	<p>To get access to your archive, please enter your password and click on <i>Download</i></p>
 
-   <form role="form" class="col-lg-offset-3 col-lg-6" action="{% url "user-download-archive" %}" method="post">
+   <div class="row">
+   <form role="form" class="col-lg-offset-3 col-lg-6" action="{% url "user-download-any-archive" %}" method="post">
 
      {% csrf_token %}
 
@@ -61,4 +62,44 @@
      </div>
 
    </form>
+   </div>
+
+   <div class="panel panel-warning">
+    <div class="panel-heading">
+     <h2 class="panel-title">{% trans "Restart from scratch" %}</h2>
+    </div>
+   <div class="panel-body">
+   <p>Unfortunately it is not possible to re-inject your archived data in gpodder.net</p>
+   <p>But if you are ready to <b>start from scratch</b>, please enter your password to <b>re-activate your account</b>:
+
+   <form role="form" action="{% url "user-reactivate" %}" method="post">
+
+     {% csrf_token %}
+
+     <input type="hidden" name="user" value="{{ username }}" />
+
+     <div class="form-group">
+      <label class="control-label">Password</label>
+      <input class="form-control" type="password" name="pwd" />
+     </div>
+
+     <div class="form-group">
+       <button class="btn btn-primary" type="submit">{% trans "Reactivate" %}</button>
+     </div>
+
+   </form>
+   </div>
+   </div>
+
+  <div class="panel panel-danger">
+    <div class="panel-heading">
+     <h2 class="panel-title">{% trans "Delete Account" %}</h2>
+    </div>
+    <div class="panel-body">
+     <p>If you have no use for your account anymore, use this button to <b>permanently delete your account</b>:
+     <a class="btn btn-danger" href="{% url "delete-account" %}">{% trans "Delete Account" %}</a>
+    </div>
+   </div>
+
+
 {% endblock %}
