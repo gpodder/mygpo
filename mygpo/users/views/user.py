@@ -1,7 +1,6 @@
 import logging
 import os
 from datetime import datetime, timedelta
-from uuid import uuid4
 
 from django.shortcuts import render
 from django.http import (
@@ -243,9 +242,6 @@ def download_any_archive(request):
     return HttpResponseBadRequest("Invalid archive state")
 
 
-RETRY_UUID_NON_UNIQUE = 3
-
-
 @login_required
 @never_cache
 def create_archive(request):
@@ -270,30 +266,21 @@ def create_archive(request):
         )
         return HttpResponseRedirect(reverse("account"))
 
-    for i in range(RETRY_UUID_NON_UNIQUE):
         try:
-            a = UserArchive(id=uuid4(), user=user, date=datetime.now())
-            a.save(force_insert=True)
+            a = UserArchive(user=user, date=datetime.now())
+            a.save_with_id_retry()
             logger.debug(
                 "Created archive for %s (%s) date %s", user.username, user.id, a.date
             )
-            break
         except IntegrityError:
-            if i == RETRY_UUID_NON_UNIQUE - 1:
-                logger.warning(
-                    "Unable to create unique archive id for %s (%s)",
-                    user.username,
-                    user.id,
-                    exc_info=True,
-                )
-                messages.error(
-                    request,
-                    _(
-                        "An error prevented us from creating the archive."
-                        "Please retry at a later time."
-                    ),
-                )
-                return HttpResponseRedirect(reverse("account"))
+            messages.error(
+                request,
+                _(
+                    "An error prevented us from creating the archive."
+                    "Please retry at a later time."
+                ),
+            )
+            return HttpResponseRedirect(reverse("account"))
 
     a.task_id = generate_archive.delay(a.id)
     a.save()

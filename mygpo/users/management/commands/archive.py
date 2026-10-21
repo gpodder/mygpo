@@ -78,7 +78,7 @@ class Command(BaseCommand):
 
         print(f"archiving user {user.username} (id={user.id})")
         archive = UserArchive(id=uuid4(), user=user, date=datetime.now())
-        archive.save()
+        archive.save_with_id_retry()
 
         archiver = UserArchiver(
             archive=archive, output_dir=output_dir, archive_dest=archive_dest
