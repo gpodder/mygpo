@@ -55,7 +55,7 @@ if _cache_used:
     CACHES = {}
     CACHES["default"] = {
         "BACKEND": os.getenv(
-            "CACHE_BACKEND", "django.core.cache.backends.memcached.MemcachedCache"
+            "CACHE_BACKEND", "django.core.cache.backends.memcached.PyMemcacheCache"
         ),
         "LOCATION": os.getenv("CACHE_LOCATION"),
     }
