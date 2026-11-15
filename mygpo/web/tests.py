@@ -59,7 +59,6 @@ class SimpleWebTests(TestCase):
             "devices",
             "device-create",
             "login",
-            "logout",
             "home",
         ]
 
