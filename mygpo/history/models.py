@@ -45,7 +45,10 @@ class HistoryEntry(models.Model):
     )
 
     class Meta:
-        index_together = [["user", "client"], ["user", "podcast"]]
+        indexes = [
+            models.Index(fields=["user", "client"]),
+            models.Index(fields=["user", "podcast"]),
+        ]
 
         ordering = ["-timestamp"]
 
@@ -109,13 +112,13 @@ class EpisodeHistoryEntry(models.Model):
     total = models.IntegerField(null=True, blank=True)
 
     class Meta:
-        index_together = [
-            ["user", "client", "episode", "action", "timestamp"],
+        indexes = [
+            models.Index(fields=["user", "client", "episode", "action", "timestamp"]),
             # see query in played_episode_counts()
-            ["user", "action", "episode"],
-            ["user", "episode", "timestamp"],
-            ["user", "timestamp"],
-            ["episode", "timestamp"],
+            models.Index(fields=["user", "action", "episode"]),
+            models.Index(fields=["user", "episode", "timestamp"]),
+            models.Index(fields=["user", "timestamp"]),
+            models.Index(fields=["episode", "timestamp"]),
         ]
 
         ordering = ["-timestamp"]
@@ -190,7 +193,7 @@ class EpisodeHistoryEntry(models.Model):
             entry.total = total
 
         if timestamp is None:
-            entry.timestamp = datetime.utcnow()
+            entry.timestamp = timezone.now()
         else:
             entry.timestamp = timestamp
 
