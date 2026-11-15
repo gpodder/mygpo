@@ -379,15 +379,9 @@ class PodcastManager(GenericManager):
             return podcast
 
     @transaction.atomic
-    def get_or_create_for_url(self, url, defaults={}):
-
+    def get_or_create_for_url(self, url, defaults=None):
         if not url:
             raise ValueError("The URL must not be empty")
-
-        # TODO: where to specify how uuid is created?
-        import uuid
-
-        defaults.update({"id": uuid.uuid1()})
 
         url = utils.to_maxlength(URL, "url", url)
         try:
@@ -398,6 +392,9 @@ class PodcastManager(GenericManager):
         except Podcast.DoesNotExist:
             # episode did not exist, try to create it
             try:
+                if not defaults:
+                    defaults = {}
+                defaults.update({"id": uuid.uuid1()})
                 with transaction.atomic():
                     podcast = Podcast.objects.create(**defaults)
                     url = URL.objects.create(
