@@ -1,5 +1,4 @@
 from django import template
-from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
@@ -29,7 +28,7 @@ def vertical_bar(value, max_value, display=None):
         left = format_html("<span>{}</span>", value_str)
         right = ""
     else:
-        left = format_html("&nbsp;")
+        left = mark_safe("&nbsp;")
         right = format_html("<span>{}</span>", value_str)
 
     return format_html(
