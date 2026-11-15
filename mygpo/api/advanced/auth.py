@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from django.contrib import auth
 from django.http import HttpResponse
@@ -20,7 +20,7 @@ def login(request, username):
     authenticates the user with regular http basic auth
     """
 
-    request.session.set_expiry(datetime.utcnow() + timedelta(days=365))
+    request.session.set_expiry(datetime.now(tz=timezone.utc) + timedelta(days=365))
     return HttpResponse()
 
 

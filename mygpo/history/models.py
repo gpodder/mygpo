@@ -1,8 +1,7 @@
-from datetime import datetime
-
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import Client

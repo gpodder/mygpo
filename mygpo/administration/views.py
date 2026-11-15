@@ -1,7 +1,7 @@
 import re
 import socket
 from itertools import count
-from datetime import datetime
+from datetime import datetime, timezone
 
 import redis
 
@@ -93,7 +93,7 @@ class HostInfo(AdminView):
         return queryset.aggregate(avg_duration=Avg("duration"))["avg_duration"]
 
     def _get_feed_queue_status(self):
-        now = datetime.utcnow()
+        now = datetime.now(tz=timezone.utc)
         next_podcast = Podcast.objects.all().order_by_next_update().first()
 
         delta = next_podcast.next_update - now

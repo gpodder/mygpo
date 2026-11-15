@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
@@ -65,7 +65,7 @@ class APIView(View):
 
         try:
             since_ = int(since_)
-            since = datetime.fromtimestamp(since_)
+            since = datetime.fromtimestamp(since_, timezone.utc)
         except ValueError:
             raise RequestException("'since' is not a valid timestamp")
 

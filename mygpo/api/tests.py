@@ -1,5 +1,5 @@
 import copy
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import json
 import unittest
 import os
@@ -44,7 +44,7 @@ class AdvancedAPITests(unittest.TestCase):
                 "episode": "http://example.com/files/s01e20.mp3",
                 "device": "gpodder_abcdef123",
                 "action": "download",
-                "timestamp": "2009-12-12T09:00:00",
+                "timestamp": "2009-12-12T09:00:00+00:00",
             },
             {
                 "podcast": "http://example.org/podcast.php",
@@ -221,7 +221,7 @@ class EpisodeActionTests(TestCase):
         """Test that max MAX_EPISODE_ACTIONS episodes are returned"""
 
         timestamps = []
-        t = datetime.utcnow()
+        t = datetime.now(timezone.utc)
         for n in range(15):
             timestamp = t - timedelta(seconds=n)
             EpisodeHistoryEntry.objects.create(
@@ -254,7 +254,7 @@ class EpisodeActionTests(TestCase):
     def test_no_actions(self):
         """Test when there are no actions to return"""
 
-        t1 = get_timestamp(datetime.utcnow())
+        t1 = get_timestamp(datetime.now(timezone.utc))
 
         url = reverse(episodes, kwargs={"version": "2", "username": self.user.username})
         response = self.client.get(url, {"since": "0"}, **self.extra)
@@ -266,7 +266,7 @@ class EpisodeActionTests(TestCase):
         self.assertEqual(len(actions), 0)
 
         returned = response_obj["timestamp"]
-        t2 = get_timestamp(datetime.utcnow())
+        t2 = get_timestamp(datetime.now(timezone.utc))
         # the `timestamp` field in the response should be the timestamp of the
         # last returned action
         self.assertGreaterEqual(returned, t1)

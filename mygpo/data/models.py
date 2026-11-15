@@ -1,8 +1,7 @@
 import uuid
 
-from datetime import datetime
-
 from django.db import models
+from django.utils import timezone
 
 from mygpo.core.models import UUIDModel
 from mygpo.podcasts.models import Podcast
@@ -20,7 +19,7 @@ class PodcastUpdateResult(UUIDModel):
     podcast = models.ForeignKey(Podcast, on_delete=models.CASCADE, null=True)
 
     # The timestamp at which the updated started to be executed
-    start = models.DateTimeField(default=datetime.utcnow)
+    start = models.DateTimeField(default=timezone.now)
 
     # The duration of the update
     duration = models.DurationField()
@@ -54,11 +53,11 @@ class PodcastUpdateResult(UUIDModel):
 
     def __enter__(self):
         self.id = uuid.uuid4()
-        self.start = datetime.utcnow()
+        self.start = timezone.now()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.duration = datetime.utcnow() - self.start
+        self.duration = timezone.now() - self.start
 
         success = (exc_type, exc_value, traceback) == (None, None, None)
         self.successful = success

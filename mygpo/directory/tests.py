@@ -1,7 +1,7 @@
 import unittest
 from unittest import mock
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.test import RequestFactory
 from django.contrib.auth import get_user_model
@@ -20,7 +20,7 @@ class ToplistTests(unittest.TestCase):
         languages = ["de", "de_AT", "en"]
         for lang in languages:
             Podcast.objects.create(
-                id=uuid.uuid1(), created=datetime.utcnow(), language=lang
+                id=uuid.uuid1(), created=datetime.now(tz=timezone.utc), language=lang
             )
 
         view = ToplistView()
@@ -50,7 +50,9 @@ class MissingPodcastTests(TestCase):
     def test_cant_add_valid_podcast(self, mock_podcast_manager_get):
         """Test valid podcast is not addable"""
         mock_podcast_manager_get.return_value = Podcast.objects.create(
-            id=uuid.uuid1(), created=datetime.utcnow(), link="https://mypodcast.com"
+            id=uuid.uuid1(),
+            created=datetime.now(tz=timezone.utc),
+            link="https://mypodcast.com",
         )
 
         response = self.request_podcast(
@@ -66,7 +68,7 @@ class MissingPodcastTests(TestCase):
     ):
         """Test valid podcast without a link is addable"""
         mock_podcast_manager_get.return_value = Podcast.objects.create(
-            id=uuid.uuid1(), created=datetime.utcnow()
+            id=uuid.uuid1(), created=datetime.now(tz=timezone.utc)
         )
 
         response = self.request_podcast(
@@ -99,7 +101,9 @@ class MissingPodcastTests(TestCase):
     ):
         """Test invalid podcast is not addable"""
         mock_podcast_manager_get.return_value = Podcast.objects.create(
-            id=uuid.uuid1(), created=datetime.utcnow(), link="https://mypodcast.com"
+            id=uuid.uuid1(),
+            created=datetime.now(tz=timezone.utc),
+            link="https://mypodcast.com",
         )
         mock_podcast_updater.side_effect = NoEpisodesException
 

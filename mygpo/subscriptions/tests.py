@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -31,7 +31,7 @@ class TestSubscribe(TestCase):
         clients = [self.client, self.client]
         changed_clients = list(
             _perform_subscribe(
-                self.podcast, self.user, clients, datetime.utcnow(), self.url
+                self.podcast, self.user, clients, datetime.now(timezone.utc), self.url
             )
         )
 
