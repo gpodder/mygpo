@@ -19,6 +19,8 @@ class Category(UpdateInfoModel):
 
     def save(self, *args, **kwargs):
         self.num_entries = self.entries.count()
+        if "update_fields" in kwargs and "num_entries" not in kwargs["update_fields"]:
+            kwargs["update_fields"] = list(kwargs["update_fields"]) + ["num_entries"]
         super(Category, self).save(*args, **kwargs)
 
     @property
