@@ -4,14 +4,6 @@ import os.path
 import dj_database_url
 
 
-try:
-    from psycopg2cffi import compat
-
-    compat.register()
-except ImportError:
-    pass
-
-
 import django
 import six
 

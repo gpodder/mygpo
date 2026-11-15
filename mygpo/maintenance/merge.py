@@ -216,7 +216,7 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
                     with transaction.atomic():
                         generic_related_object.save()
                 except IntegrityError as ie:
-                    if str(ie.__cause__.pgcode) == PG_UNIQUE_VIOLATION:
+                    if str(ie.__cause__.sqlstate) == PG_UNIQUE_VIOLATION:
                         merge(generic_related_object, primary_object)
 
         # Try to fill all missing values in primary object by
