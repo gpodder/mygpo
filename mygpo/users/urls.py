@@ -1,10 +1,8 @@
-from django.urls import path, register_converter
+from django.urls import path
 from django.contrib.auth.views import LogoutView
 
 from .views import registration, settings, device, user
-from mygpo.users import converters
-
-register_converter(converters.ClientUIDConverter, "client-uid")
+from mygpo import converters
 
 
 urlpatterns = [
