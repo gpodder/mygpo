@@ -39,7 +39,12 @@
                         <ul class="dropdown-menu">
                             <li><a href="{% url "account" %}">{% trans "Account" %}</a></li>
                             <li class="divider"></li>
-                            <li><a href="{% url "logout" %}">Sign Out</a></li>
+                            <li>
+                                <form id="logout-form" method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit">Sign Out</button>
+                                </form>
+                            </li>
                         </ul>
                         {% else %}
                         <a class="btn dropdown-toggle" data-toggle="dropdown" href="">
