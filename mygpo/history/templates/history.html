@@ -22,7 +22,7 @@
     <a href="{% url "device" client.uid %}">{% trans "Back to" %} {{ client|device_icon }} {{ client.name|striptags}}</a>
    {% endif %}
 
-   {% if not history|length_is:"0" %}
+   {% if history|length != 0 %}
    <table class="list">
 
     {% for s in history %}
