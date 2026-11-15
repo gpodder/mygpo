@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import wraps
 
 import dateutil.parser
@@ -174,9 +174,9 @@ def add_action(request, episode):
         try:
             timestamp = dateutil.parser.parse(timestamp)
         except (ValueError, AttributeError, TypeError):
-            timestamp = datetime.utcnow()
-    else:
-        timestamp = datetime.utcnow()
+            pass
+    if not timestamp:
+        timestamp = datetime.now(tz=timezone.utc)
 
     EpisodeHistoryEntry.create_entry(user, episode, action_str, client, timestamp)
     podcast = episode.podcast

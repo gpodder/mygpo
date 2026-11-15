@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import datetime
 from django.db import migrations, models
 import django.db.models.deletion
+from django.utils import timezone
 
 
 class Migration(migrations.Migration):
@@ -18,7 +19,7 @@ class Migration(migrations.Migration):
             name="PodcastUpdateResult",
             fields=[
                 ("id", models.UUIDField(primary_key=True, serialize=False)),
-                ("start", models.DateTimeField(default=datetime.datetime.utcnow)),
+                ("start", models.DateTimeField(default=timezone.now)),
                 ("duration", models.DurationField()),
                 ("successful", models.BooleanField()),
                 ("error_message", models.TextField()),

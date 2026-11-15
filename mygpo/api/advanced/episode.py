@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from mygpo.api import APIView, RequestException
 from mygpo.api.httpresponse import JsonResponse
@@ -12,7 +12,7 @@ class ChaptersAPI(APIView):
     def post(self, request, username):
         """Add / remove Chapters to/from an episode"""
         user = request.user
-        now_ = get_timestamp(datetime.utcnow())
+        now_ = get_timestamp(datetime.now(tz=timezone.utc))
 
         body = self.parsed_body(request)
 
@@ -29,7 +29,7 @@ class ChaptersAPI(APIView):
     def get(self, request, username):
         """Get chapters for an episode"""
         user = request.user
-        now_ = get_timestamp(datetime.utcnow())
+        now_ = get_timestamp(datetime.now(tz=timezone.utc))
 
         podcast_url, episode_url, _update_urls = self.get_urls(request)
 

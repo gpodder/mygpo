@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from importlib import import_module
 
 from celery import shared_task
@@ -46,7 +46,7 @@ def remove_inactive_users():
 
     # time for which to keep unactivated and deleted users
     valid_days = settings.ACTIVATION_VALID_DAYS
-    remove_before = datetime.utcnow() - timedelta(days=valid_days)
+    remove_before = datetime.now(tz=timezone.utc) - timedelta(days=valid_days)
     logger.warning("Removing unactivated users before %s", remove_before)
 
     users = User.objects.filter(

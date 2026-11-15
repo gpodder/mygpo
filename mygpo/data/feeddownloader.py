@@ -3,7 +3,7 @@
 
 import os.path
 from urllib.parse import urljoin
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from itertools import chain, islice
 import requests
 
@@ -272,7 +272,7 @@ class PodcastUpdater(object):
         # The podcast is always saved (not just when there are changes) because
         # we need to record the last update
         logger.info("Saving podcast.")
-        podcast.last_update = datetime.utcnow()
+        podcast.last_update = datetime.now(tz=timezone.utc)
         podcast.save()
 
         try:
@@ -300,7 +300,7 @@ class PodcastUpdater(object):
     def _update_categories(self, podcast, prev_timestamp):
         """checks some practical requirements and updates a category"""
 
-        max_timestamp = datetime.utcnow() + timedelta(days=1)
+        max_timestamp = datetime.now(tz=timezone.utc) + timedelta(days=1)
 
         # no episodes at all
         if not podcast.latest_episode_timestamp:
@@ -323,7 +323,7 @@ class PodcastUpdater(object):
     def _mark_outdated(self, podcast, msg, episode_updater):
         logger.info("marking podcast outdated: %s", msg)
         podcast.outdated = True
-        podcast.last_update = datetime.utcnow()
+        podcast.last_update = datetime.now(tz=timezone.utc)
         podcast.save()
         episode_updater.update_episodes([])
 
@@ -426,7 +426,7 @@ class MultiEpisodeUpdater(object):
             return DEFAULT_UPDATE_INTERVAL
 
         earliest = episodes.first()
-        now = datetime.utcnow()
+        now = datetime.now(tz=timezone.utc)
 
         timespan_s = (now - earliest.released).total_seconds()
         timespan_h = timespan_s / 60 / 60
@@ -492,7 +492,7 @@ class EpisodeUpdater(object):
         )
 
         self.episode.released = (
-            datetime.utcfromtimestamp(parsed_episode.get("released"))
+            datetime.fromtimestamp(parsed_episode.get("released"), tz=timezone.utc)
             if parsed_episode.get("released")
             else self.episode.released
         )
@@ -530,7 +530,7 @@ class EpisodeUpdater(object):
             or file_basename_no_extension(self.episode.url),
         )
 
-        self.episode.last_update = datetime.utcnow()
+        self.episode.last_update = datetime.now(tz=timezone.utc)
         self.episode.save()
 
         parsed_urls = list(
@@ -546,7 +546,7 @@ class EpisodeUpdater(object):
             return None
 
         self.episode.outdated = True
-        self.episode.last_update = datetime.utcnow()
+        self.episode.last_update = datetime.now(tz=timezone.utc)
         self.episode.save()
 
 

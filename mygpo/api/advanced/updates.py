@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.contrib.sites.requests import RequestSite
@@ -39,7 +39,7 @@ class DeviceUpdates(View):
     @method_decorator(cors_origin())
     def get(self, request, username, device_uid):
 
-        now = datetime.utcnow()
+        now = datetime.now(tz=timezone.utc)
 
         user = request.user
 
@@ -140,6 +140,6 @@ class DeviceUpdates(View):
         if since_ is None:
             raise ValueError("parameter since missing")
         try:
-            return datetime.fromtimestamp(float(since_))
+            return datetime.fromtimestamp(float(since_), tz=timezone.utc)
         except ValueError as e:
             raise ValueError("'since' is not a valid timestamp: %s" % str(e))

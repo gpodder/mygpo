@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from django.shortcuts import render
 from django.views import View
@@ -30,7 +30,7 @@ class UserpageView(View):
 
         User = get_user_model()
         user = User.objects.get(username=username)
-        month_ago = datetime.today() - timedelta(days=31)
+        month_ago = datetime.now(tz=timezone.utc) - timedelta(days=31)
         site = RequestSite(request)
 
         context = {

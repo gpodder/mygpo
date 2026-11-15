@@ -1,8 +1,9 @@
-from datetime import datetime
+import datetime
 
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import Client
@@ -193,7 +194,9 @@ class EpisodeHistoryEntry(models.Model):
             entry.total = total
 
         if timestamp is None:
-            entry.timestamp = datetime.utcnow()
+            entry.timestamp = timezone.now()
+        elif timestamp.tzinfo is None:
+            entry.timestamp = timestamp.replace(tzinfo=datetime.timezone.utc)
         else:
             entry.timestamp = timestamp
 
