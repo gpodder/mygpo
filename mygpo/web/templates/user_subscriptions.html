@@ -26,7 +26,7 @@
 
 {% block content %}
 
- {% if not subscriptionlist|length_is:"0" %}
+ {% if subscriptionlist|length != 0 %}
  <table class="list">
 
   {% for sp in subscriptions %}
