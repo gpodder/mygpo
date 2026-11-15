@@ -32,11 +32,6 @@ urlpatterns = [
     ),
     path("developer/", TemplateView.as_view(template_name="developer.html")),
     path(
-        "contribute/",
-        TemplateView.as_view(template_name="contribute.html"),
-        name="contribute",
-    ),
-    path(
         "privacy/",
         TemplateView.as_view(template_name="privacy_policy.html"),
         name="privacy-policy",

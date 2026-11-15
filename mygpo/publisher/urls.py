@@ -82,5 +82,4 @@ urlpatterns = [
     path("group/<slug:pg_slug>", views.group_id, name="group-publisher-id"),
     path("podcast/search", views.search_podcast, name="podcast-publisher-search"),
     path("link/", views.link, name="link-here"),
-    path("advertise", views.advertise, name="advertise"),
 ]
