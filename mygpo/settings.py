@@ -186,17 +186,6 @@ INSTALLED_APPS = [
 
 try:
     if DEBUG:
-        import debug_toolbar
-
-        INSTALLED_APPS += ["debug_toolbar"]
-        MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
-
-except ImportError:
-    pass
-
-
-try:
-    if DEBUG:
         import django_extensions
 
         INSTALLED_APPS += ["django_extensions"]
