@@ -205,10 +205,8 @@ AUTHENTICATION_BACKENDS = (
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
-# TODO: use (default) JSON serializer for security
-# this would currently fail as we're (de)serializing datetime objects
-# https://docs.djangoproject.com/en/1.5/topics/http/sessions/#session-serialization
-SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
+# WARNING: don't store un-jsonizable objects anymore, like datetime
+SESSION_SERIALIZER = "django.contrib.sessions.serializers.JSONSerializer"
 
 
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
