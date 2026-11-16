@@ -2,7 +2,7 @@
 
 
 from django.db import models, migrations
-import datetime
+from django.utils import timezone
 
 
 class Migration(migrations.Migration):
@@ -13,11 +13,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="episode",
             name="created",
-            field=models.DateTimeField(default=datetime.datetime.utcnow),
+            field=models.DateTimeField(default=timezone.now),
         ),
         migrations.AlterField(
             model_name="podcast",
             name="created",
-            field=models.DateTimeField(default=datetime.datetime.utcnow),
+            field=models.DateTimeField(default=timezone.now),
         ),
     ]

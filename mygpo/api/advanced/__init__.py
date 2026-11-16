@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from importlib import import_module
 
 import dateutil.parser
@@ -62,7 +62,7 @@ EPISODE_ACTION_KEYS = (
 def episodes(request, username, version=1):
 
     version = int(version)
-    now = datetime.utcnow()
+    now = datetime.now(tz=timezone.utc)
     now_ = get_timestamp(now)
     ua_string = request.META.get("HTTP_USER_AGENT", "")
 
@@ -132,7 +132,7 @@ def episodes(request, username, version=1):
         try:
             since = int(since_) if since_ else None
             if since is not None:
-                since = datetime.utcfromtimestamp(since)
+                since = datetime.fromtimestamp(since, timezone.utc)
         except ValueError:
             return HttpResponseBadRequest("since-value is not a valid timestamp")
 
@@ -213,7 +213,8 @@ def episode_action_json(history, user):
         "episode": history.episode_ref_url or history.episode.url,
         "guid": history.episode.guid,
         "action": history.action,
-        "timestamp": history.timestamp.isoformat(),
+        # mygpoclient doesn't support a date ending with timezone offset
+        "timestamp": history.timestamp.isoformat().replace("+00:00", "Z"),
     }
 
     if history.client:

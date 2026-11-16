@@ -4,13 +4,14 @@ import json
 import subprocess
 import sys
 import re
-from datetime import datetime, timedelta, date
 import time
 import hashlib
 import urllib.parse
 import urllib.request, urllib.parse, urllib.error
 import urllib.request, urllib.error, urllib.parse
 import zlib
+
+from datetime import datetime, timedelta, timezone
 
 from django.db import transaction, IntegrityError
 from django.conf import settings
@@ -23,17 +24,16 @@ logger = logging.getLogger(__name__)
 
 def daterange(from_date, to_date=None, leap=timedelta(days=1)):
     """
-    >>> from_d = datetime(2010, 1, 1)
-    >>> to_d = datetime(2010, 1, 5)
+    >>> from_d = datetime(2010, 1, 1, tzinfo=timezone.utc)
+    >>> to_d = datetime(2010, 1, 5, tzinfo=timezone.utc)
     >>> list(daterange(from_d, to_d))
-    [datetime.datetime(2010, 1, 1, 0, 0), datetime.datetime(2010, 1, 2, 0, 0), datetime.datetime(2010, 1, 3, 0, 0), datetime.datetime(2010, 1, 4, 0, 0), datetime.datetime(2010, 1, 5, 0, 0)]
+    [datetime.datetime(2010, 1, 1, 0, 0, tzinfo=datetime.timezone.utc), datetime.datetime(2010, 1, 2, 0, 0, tzinfo=datetime.timezone.utc), datetime.datetime(2010, 1, 3, 0, 0, tzinfo=datetime.timezone.utc), datetime.datetime(2010, 1, 4, 0, 0, tzinfo=datetime.timezone.utc), datetime.datetime(2010, 1, 5, 0, 0, tzinfo=datetime.timezone.utc)]
     """
 
     if to_date is None:
-        if isinstance(from_date, datetime):
-            to_date = datetime.utcnow()
-        else:
-            to_date = date.today()
+        to_date = datetime.now(tz=timezone.utc)
+        if not isinstance(from_date, datetime):
+            to_date = to_date.date()
 
     while from_date <= to_date:
         yield from_date
@@ -56,7 +56,7 @@ def format_time(value):
     '03:02:01'
     """
     try:
-        dt = datetime.utcfromtimestamp(value)
+        dt = datetime.fromtimestamp(value, timezone.utc)
     except (ValueError, TypeError):
         return ""
 
@@ -190,7 +190,9 @@ def get_timestamp(datetime_obj):
     >>> get_timestamp(datetime(1970, 1, 1, 0, 0, 0))
     0
     """
-    return int(time.mktime(datetime_obj.timetuple()))
+    if datetime_obj.tzinfo is None:
+        datetime_obf = datetime_obj.replace(tzinfo=timezone.utc)
+    return int(datetime_obj.timestamp())
 
 
 re_url = re.compile("^https?://")

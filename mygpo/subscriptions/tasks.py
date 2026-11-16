@@ -1,7 +1,6 @@
-from datetime import datetime
-
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.utils import timezone
 from celery import shared_task
 
 from mygpo.subscriptions.models import Subscription
@@ -28,7 +27,7 @@ def subscribe(podcast_pk, user_pk, client_uid, ref_url=None):
     client = user.client_set.get(uid=client_uid)
 
     ref_url = ref_url or podcast.url
-    now = datetime.utcnow()
+    now = timezone.now()
     clients = _affected_clients(client)
 
     # fully execute subscriptions, before firing events
@@ -48,7 +47,7 @@ def unsubscribe(podcast_pk, user_pk, client_uid):
 
     client = user.client_set.get(uid=client_uid)
 
-    now = datetime.utcnow()
+    now = timezone.now()
     clients = _affected_clients(client)
 
     # fully execute unsubscriptions, before firing events
@@ -66,7 +65,7 @@ def subscribe_all(podcast_pk, user_pk, ref_url=None):
     user = User.objects.get(pk=user_pk)
 
     ref_url = ref_url or podcast.url
-    now = datetime.utcnow()
+    now = timezone.now()
     clients = user.client_set.all()
 
     # fully execute subscriptions, before firing events
@@ -82,7 +81,7 @@ def unsubscribe_all(podcast_pk, user_pk):
     User = get_user_model()
     user = User.objects.get(pk=user_pk)
 
-    now = datetime.utcnow()
+    now = timezone.now()
     clients = user.client_set.filter(subscription__podcast=podcast)
 
     # fully execute subscriptions, before firing events

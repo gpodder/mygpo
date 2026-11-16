@@ -1,6 +1,6 @@
 import unittest
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from django.test import TestCase
 
@@ -16,7 +16,7 @@ class PodcastTests(unittest.TestCase):
 
     def test_next_update(self):
         """Test calculation of Podcast.next_update"""
-        last_update = datetime(2014, 3, 31, 11, 00)
+        last_update = datetime(2014, 3, 31, 11, 00, tzinfo=timezone.utc)
         update_interval = 123  # hours
 
         # create an "old" podcast with update-information

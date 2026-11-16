@@ -1,11 +1,8 @@
-from django.urls import path, register_converter, include
+from django.urls import path, include
 
 from . import views
 
-from mygpo.users import converters
-
-
-register_converter(converters.UsernameConverter, "username")
+from mygpo import converters
 
 
 userpatterns = [

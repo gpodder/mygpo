@@ -203,7 +203,7 @@ class Slug(OrderedModel, ScopedModel):
             ("content_type", "object_id", "order"),
         )
 
-        index_together = [("slug", "content_type")]
+        indexes = [models.Index(fields=["slug", "content_type"])]
 
     def __repr__(self):
         return "{cls}(slug={slug}, order={order}, content_object={obj}".format(
@@ -379,15 +379,9 @@ class PodcastManager(GenericManager):
             return podcast
 
     @transaction.atomic
-    def get_or_create_for_url(self, url, defaults={}):
-
+    def get_or_create_for_url(self, url, defaults=None):
         if not url:
             raise ValueError("The URL must not be empty")
-
-        # TODO: where to specify how uuid is created?
-        import uuid
-
-        defaults.update({"id": uuid.uuid1()})
 
         url = utils.to_maxlength(URL, "url", url)
         try:
@@ -398,6 +392,9 @@ class PodcastManager(GenericManager):
         except Podcast.DoesNotExist:
             # episode did not exist, try to create it
             try:
+                if not defaults:
+                    defaults = {}
+                defaults.update({"id": uuid.uuid1()})
                 with transaction.atomic():
                     podcast = Podcast.objects.create(**defaults)
                     url = URL.objects.create(
@@ -587,7 +584,7 @@ class Podcast(
     objects = PodcastManager()
 
     class Meta:
-        index_together = [("last_update",)]
+        indexes = [models.Index(fields=["last_update"])]
 
     def subscriber_count(self):
         # TODO: implement
@@ -821,13 +818,13 @@ class Episode(
     class Meta:
         ordering = ["-order", "-released"]
 
-        index_together = [
-            ("podcast", "outdated", "released"),
-            ("podcast", "released"),
-            ("released", "podcast"),
+        indexes = [
+            models.Index(fields=["podcast", "outdated", "released"]),
+            models.Index(fields=["podcast", "released"]),
+            models.Index(fields=["released", "podcast"]),
             # index for typical episode toplist queries
-            ("language", "listeners"),
-            ("podcast", "order", "released"),
+            models.Index(fields=["language", "listeners"]),
+            models.Index(fields=["podcast", "order", "released"]),
         ]
 
     @property

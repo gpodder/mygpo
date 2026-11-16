@@ -102,7 +102,7 @@
   <h4>{% trans "Synchronize" %}</h4>
   <p>{% blocktrans %}If you synchronize devices, they will always have the same subscriptions. A podcast that is subscribed on one device, will automatically be added to all synchronized devices.{% endblocktrans %}</p>
 
-  {% if synced_with|length_is:"0" %}
+  {% if synced_with|length == 0 %}
 
    <p>{% blocktrans with device.name|striptags as devicename %}{{ devicename }} is currently not synchronized with other devices.{% endblocktrans %}</p>
 
