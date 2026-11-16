@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -193,6 +195,8 @@ class EpisodeHistoryEntry(models.Model):
 
         if timestamp is None:
             entry.timestamp = timezone.now()
+        elif timestamp.tzinfo is None:
+            entry.timestamp = timestamp.replace(tzinfo=datetime.timezone.utc)
         else:
             entry.timestamp = timestamp
 

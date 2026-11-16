@@ -213,7 +213,8 @@ def episode_action_json(history, user):
         "episode": history.episode_ref_url or history.episode.url,
         "guid": history.episode.guid,
         "action": history.action,
-        "timestamp": history.timestamp.isoformat(),
+        # mygpoclient doesn't support a date ending with timezone offset
+        "timestamp": history.timestamp.isoformat().replace("+00:00", "Z"),
     }
 
     if history.client:
