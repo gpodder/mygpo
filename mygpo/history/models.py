@@ -167,6 +167,7 @@ class EpisodeHistoryEntry(models.Model):
             user=user,
             episode=episode,
             client=client,
+            timestamp=timestamp,
             action=action,
             started=started,
             stopped=stopped,
