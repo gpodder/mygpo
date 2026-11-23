@@ -35,7 +35,10 @@ class Subscription(DeleteableModel):
     class Meta:
         unique_together = [["user", "client", "podcast"]]
 
-        index_together = [["user", "client"], ["podcast", "user"]]
+        indexes = [
+            models.Index(fields=["user", "client"]),
+            models.Index(fields=["podcast", "user"]),
+        ]
 
     def __str__(self):
         return "{user} subscribed to {podcast} on {client}".format(

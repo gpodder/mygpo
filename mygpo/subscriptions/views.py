@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -81,7 +81,7 @@ def create_subscriptionlist(request):
 
     # sort most recently updated podcast first
     subscriptions = subscription_list.values()
-    now = datetime.utcnow()
+    now = datetime.now(tz=timezone.utc)
     sort_key = lambda s: s["podcast"].latest_episode_timestamp or now
     subscriptions = sorted(subscriptions, key=sort_key, reverse=True)
     return subscriptions

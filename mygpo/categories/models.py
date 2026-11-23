@@ -15,10 +15,12 @@ class Category(UpdateInfoModel):
         verbose_name = "Category"
         verbose_name_plural = "Categories"
 
-        index_together = [("modified", "num_entries")]
+        indexes = [models.Index(fields=["modified", "num_entries"])]
 
     def save(self, *args, **kwargs):
         self.num_entries = self.entries.count()
+        if "update_fields" in kwargs and "num_entries" not in kwargs["update_fields"]:
+            kwargs["update_fields"] = list(kwargs["update_fields"]) + ["num_entries"]
         super(Category, self).save(*args, **kwargs)
 
     @property
@@ -46,7 +48,7 @@ class CategoryEntry(UpdateInfoModel):
     class Meta:
         unique_together = [("category", "podcast")]
 
-        index_together = [("category", "modified")]
+        indexes = [models.Index(fields=["category", "modified"])]
 
 
 class CategoryTag(models.Model):

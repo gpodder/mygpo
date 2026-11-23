@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.shortcuts import get_object_or_404
 
@@ -21,7 +21,7 @@ class SubscriptionsAPI(APIView):
 
     def get(self, request, version, username, device_uid):
         """Client retrieves subscription updates"""
-        now = datetime.utcnow()
+        now = datetime.now(tz=timezone.utc)
         user = request.user
         device = get_object_or_404(Client, user=user, uid=device_uid)
         since = self.get_since(request)
@@ -30,7 +30,7 @@ class SubscriptionsAPI(APIView):
 
     def post(self, request, version, username, device_uid):
         """Client sends subscription updates"""
-        now = get_timestamp(datetime.utcnow())
+        now = get_timestamp(datetime.now(tz=timezone.utc))
         logger.info(
             "Subscription Upload @{username}/{device_uid}".format(
                 username=request.user.username, device_uid=device_uid

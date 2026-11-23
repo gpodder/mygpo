@@ -1,5 +1,5 @@
 from operator import itemgetter
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from django.db import IntegrityError
 
@@ -53,7 +53,7 @@ UPDATE_INTERVAL = timedelta(hours=1)
 @close_connection
 def schedule_updates(interval=UPDATE_INTERVAL):
     """Schedules podcast updates that are due within ``interval``"""
-    now = datetime.utcnow()
+    now = datetime.now(tz=timezone.utc)
 
     # max number of updates to schedule (one every 10s)
     max_updates = UPDATE_INTERVAL.total_seconds() / 10

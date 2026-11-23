@@ -1,10 +1,7 @@
-from django.urls import path, register_converter, include
+from django.urls import path, include
 
 from .views import podcast, episode
-from mygpo.users import converters
-
-
-register_converter(converters.ClientUIDConverter, "client-uid")
+from mygpo import converters
 
 
 podcast_uuid_patterns = [

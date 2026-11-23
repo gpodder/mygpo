@@ -1,6 +1,6 @@
 import uuid
 from functools import partial
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
@@ -48,8 +48,8 @@ def create(request, username, format):
             "id": uuid.uuid1(),
             "title": title,
             "slug": slug,
-            "created": datetime.utcnow(),
-            "modified": datetime.utcnow(),
+            "created": datetime.now(tz=timezone.utc),
+            "modified": datetime.now(tz=timezone.utc),
         },
     )
 

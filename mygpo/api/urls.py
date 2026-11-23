@@ -2,13 +2,8 @@ from django.urls import path, register_converter
 
 from . import legacy, simple, advanced, subscriptions
 from .advanced import auth, lists, sync, updates, episode, settings
-from mygpo.users import converters
-from mygpo.usersettings.converters import ScopeConverter
 
-register_converter(converters.ClientUIDConverter, "client-uid")
-register_converter(converters.UsernameConverter, "username")
-register_converter(ScopeConverter, "scope")
-
+from mygpo import converters
 
 urlpatterns = [
     path("upload", legacy.upload),
