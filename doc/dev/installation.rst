@@ -8,7 +8,7 @@ Dependencies
 When no version number is indicated, it is advisable to install the current
 development version from the repository.
 
-* Python >= 3.5
+* Python >= 3.10
 * PostgreSQL
 * Redis
 

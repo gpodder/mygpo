@@ -1,5 +1,3 @@
-from datetime import datetime, timedelta
-
 from django.contrib import auth
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -20,7 +18,7 @@ def login(request, username):
     authenticates the user with regular http basic auth
     """
 
-    request.session.set_expiry(datetime.utcnow() + timedelta(days=365))
+    request.session.set_expiry(365 * 24 * 60 * 60)
     return HttpResponse()
 
 

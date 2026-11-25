@@ -14,8 +14,11 @@ General
 * ``DEFAULT_BASE_URL`` - base URL for creating URLs, eg ``https://gpodder.net``
 * ``MAINTENANCE`` - Maintenance flag
 * ``SECRET_KEY`` - see `Django's SECRET_KEY setting <https://docs.djangoproject.com/en/1.11/ref/settings/#secret-key>`_
+* ``ALLOWED_HOSTS`` - space-separated hostnames accepted by Django; set every public hostname used by the deployment
 * ``STAFF_TOKEN`` - token which can be appended to URLs to access staff-only pages
 * ``SUPPORT_URL`` - URL where users can get support
+
+Existing sessions use a legacy pickle serializer. Switching to JSON expires those sessions; users will need to log in again.
 
 
 Advertising

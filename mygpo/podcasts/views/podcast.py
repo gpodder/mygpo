@@ -11,6 +11,7 @@ from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 from django.shortcuts import get_object_or_404
 from django.contrib.contenttypes.models import ContentType
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from mygpo.podcasts.models import Podcast, PodcastGroup, Episode, Tag
 from mygpo.users.models import SubscriptionException
@@ -290,12 +291,16 @@ def subscribe_all(request, podcast):
 
 @never_cache
 @login_required
+@allowed_methods(["POST"])
 def unsubscribe(request, podcast, device_uid):
 
-    return_to = request.GET.get("return_to", None)
-
-    if not return_to:
-        raise Http404("Wrong URL")
+    return_to = request.POST.get("return_to", "")
+    if not url_has_allowed_host_and_scheme(
+        return_to,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return_to = get_podcast_link_target(podcast)
 
     user = request.user
     try:

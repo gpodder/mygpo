@@ -1,9 +1,12 @@
 import os.path
 import io
-import requests
 import hashlib
 import socket
 import struct
+import ipaddress
+import urllib.parse
+import http.client
+import ssl
 
 from PIL import Image
 
@@ -21,6 +24,111 @@ from mygpo.utils import file_hash
 import logging
 
 logger = logging.getLogger(__name__)
+
+MAX_COVER_ART_BYTES = 5 * 1024 * 1024
+MAX_COVER_ART_REDIRECTS = 3
+
+
+class _PinnedHTTPConnection(http.client.HTTPConnection):
+    def __init__(self, host, port, address):
+        super().__init__(host, port, timeout=3.05)
+        self.address = address
+
+    def connect(self):
+        self.sock = socket.create_connection(
+            (self.address, self.port), self.timeout, self.source_address
+        )
+        self.sock.settimeout(10)
+
+
+class _PinnedHTTPSConnection(_PinnedHTTPConnection):
+    def __init__(self, host, port, address):
+        super().__init__(host, port, address)
+        self.context = ssl.create_default_context()
+
+    def connect(self):
+        super().connect()
+        self.sock = self.context.wrap_socket(self.sock, server_hostname=self.host)
+
+
+def _public_http_addresses(url):
+    parsed = urllib.parse.urlsplit(url)
+    if parsed.scheme not in ("http", "https") or not parsed.hostname:
+        raise ValueError("Cover art URL must use HTTP or HTTPS")
+    if parsed.username or parsed.password:
+        raise ValueError("Cover art URL must not contain credentials")
+
+    try:
+        port = parsed.port or (443 if parsed.scheme == "https" else 80)
+    except ValueError as exc:
+        raise ValueError("Cover art URL has an invalid port") from exc
+    if port != (443 if parsed.scheme == "https" else 80):
+        raise ValueError("Cover art URL must use a standard HTTP(S) port")
+    try:
+        addresses = {
+            item[4][0]
+            for item in socket.getaddrinfo(
+                parsed.hostname, port, type=socket.SOCK_STREAM
+            )
+        }
+    except OSError as exc:
+        raise ValueError("Cover art host could not be resolved") from exc
+
+    if not addresses or any(
+        not ipaddress.ip_address(address).is_global for address in addresses
+    ):
+        raise ValueError("Cover art host must resolve only to public addresses")
+    return parsed, port, addresses
+
+
+def _download_cover_art(url):
+    for redirect in range(MAX_COVER_ART_REDIRECTS + 1):
+        parsed, port, addresses = _public_http_addresses(url)
+        path = urllib.parse.urlunsplit(("", "", parsed.path or "/", parsed.query, ""))
+        response = None
+        for address in addresses:
+            connection_type = (
+                _PinnedHTTPSConnection
+                if parsed.scheme == "https"
+                else _PinnedHTTPConnection
+            )
+            connection = connection_type(parsed.hostname, port, address)
+            try:
+                connection.request(
+                    "GET",
+                    path,
+                    headers={"Host": parsed.netloc, "Accept-Encoding": "identity"},
+                )
+                response = connection.getresponse()
+                break
+            except (OSError, http.client.HTTPException):
+                connection.close()
+        if response is None:
+            raise ValueError("Cover art host could not be reached")
+
+        try:
+            if response.status in (301, 302, 303, 307, 308):
+                location = response.getheader("Location")
+                if not location or redirect == MAX_COVER_ART_REDIRECTS:
+                    raise ValueError("Too many or invalid cover art redirects")
+                url = urllib.parse.urljoin(url, location)
+                continue
+            if response.status != 200:
+                raise ValueError("Cover art server returned an unexpected status")
+            if response.getheader("Content-Encoding", "identity").lower() != "identity":
+                raise ValueError("Compressed cover art responses are not supported")
+            length = response.getheader("Content-Length")
+            if length and int(length) > MAX_COVER_ART_BYTES:
+                raise ValueError("Cover art exceeds the size limit")
+            data = response.read(MAX_COVER_ART_BYTES + 1)
+            if len(data) > MAX_COVER_ART_BYTES:
+                raise ValueError("Cover art exceeds the size limit")
+            return io.BytesIO(data)
+        finally:
+            response.close()
+            connection.close()
+    raise ValueError("Too many cover art redirects")
+
 
 # Use Django's File Storage API to access podcast logos. This could be swapped
 # out for another storage implementation (eg for storing to Amazon S3)
@@ -144,8 +252,8 @@ class CoverArt(View):
             logger.info("Logo {}, saving to {}".format(cover_art_url, filename))
 
             # save new cover art
+            source = _download_cover_art(cover_art_url)
             LOGO_STORAGE.delete(filename)
-            source = io.BytesIO(requests.get(cover_art_url).content)
             LOGO_STORAGE.save(filename, source)
 
             # get hash of new file
@@ -161,7 +269,7 @@ class CoverArt(View):
 
         except (
             ValueError,
-            requests.exceptions.RequestException,
+            http.client.HTTPException,
             socket.error,
             IOError,
         ) as e:

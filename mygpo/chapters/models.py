@@ -25,7 +25,13 @@ class Chapter(UpdateInfoModel):
     episode = models.ForeignKey(Episode, on_delete=models.CASCADE)
 
     class Meta:
-        index_together = [
-            ("user", "episode", "created"),
-            ("episode", "user", "start", "end"),
+        indexes = [
+            models.Index(
+                fields=["user", "episode", "created"],
+                name="chapter_user_ep_created_idx",
+            ),
+            models.Index(
+                fields=["episode", "user", "start", "end"],
+                name="chapter_ep_user_range_idx",
+            ),
         ]

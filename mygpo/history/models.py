@@ -45,7 +45,10 @@ class HistoryEntry(models.Model):
     )
 
     class Meta:
-        index_together = [["user", "client"], ["user", "podcast"]]
+        indexes = [
+            models.Index(fields=["user", "client"], name="hist_user_client_idx"),
+            models.Index(fields=["user", "podcast"], name="hist_user_podcast_idx"),
+        ]
 
         ordering = ["-timestamp"]
 
@@ -109,13 +112,20 @@ class EpisodeHistoryEntry(models.Model):
     total = models.IntegerField(null=True, blank=True)
 
     class Meta:
-        index_together = [
-            ["user", "client", "episode", "action", "timestamp"],
+        indexes = [
+            models.Index(
+                fields=["user", "client", "episode", "action", "timestamp"],
+                name="ehist_user_cli_ep_act_ts_idx",
+            ),
             # see query in played_episode_counts()
-            ["user", "action", "episode"],
-            ["user", "episode", "timestamp"],
-            ["user", "timestamp"],
-            ["episode", "timestamp"],
+            models.Index(
+                fields=["user", "action", "episode"], name="ehist_user_act_ep_idx"
+            ),
+            models.Index(
+                fields=["user", "episode", "timestamp"], name="ehist_user_ep_ts_idx"
+            ),
+            models.Index(fields=["user", "timestamp"], name="ehist_user_ts_idx"),
+            models.Index(fields=["episode", "timestamp"], name="ehist_ep_ts_idx"),
         ]
 
         ordering = ["-timestamp"]

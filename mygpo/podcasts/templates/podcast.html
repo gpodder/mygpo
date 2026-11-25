@@ -125,9 +125,10 @@
        </a>
        <form class="internal"
              method="post"
-             action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}"
+             action="{% podcast_link_target podcast "unsubscribe" device.uid %}"
              id="unsubscribe-{{ device.uid }}">
         {% csrf_token %}
+        <input type="hidden" name="return_to" value="{% podcast_link_target podcast %}" />
        </form>
       </li>
      {% endfor %}

@@ -15,7 +15,11 @@ class Category(UpdateInfoModel):
         verbose_name = "Category"
         verbose_name_plural = "Categories"
 
-        index_together = [("modified", "num_entries")]
+        indexes = [
+            models.Index(
+                fields=["modified", "num_entries"], name="cat_modified_entries_idx"
+            )
+        ]
 
     def save(self, *args, **kwargs):
         self.num_entries = self.entries.count()
@@ -46,7 +50,9 @@ class CategoryEntry(UpdateInfoModel):
     class Meta:
         unique_together = [("category", "podcast")]
 
-        index_together = [("category", "modified")]
+        indexes = [
+            models.Index(fields=["category", "modified"], name="catentry_cat_mod_idx")
+        ]
 
 
 class CategoryTag(models.Model):

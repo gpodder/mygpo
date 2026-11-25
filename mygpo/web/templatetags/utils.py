@@ -65,8 +65,45 @@ def is_tuple(obj):
 @register.filter()
 def markdown(txt):
     import markdown2
+    import nh3
 
-    return mark_safe(markdown2.markdown(txt, extras={"nofollow": True}))
+    rendered = markdown2.markdown(txt, extras={"nofollow": True})
+    return mark_safe(
+        nh3.clean(
+            rendered,
+            tags={
+                "a",
+                "abbr",
+                "blockquote",
+                "br",
+                "code",
+                "del",
+                "em",
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "h5",
+                "h6",
+                "hr",
+                "img",
+                "li",
+                "ol",
+                "p",
+                "pre",
+                "strong",
+                "table",
+                "tbody",
+                "td",
+                "th",
+                "thead",
+                "tr",
+                "ul",
+            },
+            attributes={"a": ["href", "title"], "img": ["src", "alt", "title"]},
+            url_schemes={"http", "https", "mailto"},
+        )
+    )
 
 
 @register.filter()

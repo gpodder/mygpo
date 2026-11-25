@@ -25,8 +25,9 @@
       <td class="logo">{{ podcast|podcast_logo }}</td>
       <td>{% podcast_group_link podcast %}</td>
       <td>
-       <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to=/device/{{ device.uid }}" >
+       <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}" >
         {% csrf_token %}
+        <input type="hidden" name="return_to" value="/device/{{ device.uid }}" />
         <button class="btn btn-danger btn-sm" type="submit">
          <i class="icon-remove"></i> {% trans "Unsubscribe" %}
         </button>

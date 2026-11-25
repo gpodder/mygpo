@@ -224,10 +224,7 @@ AUTHENTICATION_BACKENDS = (
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
-# TODO: use (default) JSON serializer for security
-# this would currently fail as we're (de)serializing datetime objects
-# https://docs.djangoproject.com/en/1.5/topics/http/sessions/#session-serialization
-SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
+SESSION_SERIALIZER = "django.contrib.sessions.serializers.JSONSerializer"
 
 
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
@@ -245,8 +242,10 @@ SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
 
 SECRET_KEY = os.getenv("SECRET_KEY", "")
 
-if "pytest" in sys.argv[0]:
+if "pytest" in os.path.basename(sys.argv[0]) or sys.argv[1:2] == ["test"]:
     SECRET_KEY = "test"
+elif not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY must be set")
 
 DIRECTORY_EXCLUDED_TAGS = os.getenv("DIRECTORY_EXCLUDED_TAGS", "").split()
 
@@ -257,7 +256,7 @@ SOUNDCLOUD_CONSUMER_KEY = os.getenv("SOUNDCLOUD_CONSUMER_KEY", "")
 MAINTENANCE = get_bool("MAINTENANCE", False)
 
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost 127.0.0.1").split()
 
 
 LOGGING = {
